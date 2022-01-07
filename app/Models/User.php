@@ -58,4 +58,14 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    /**
+     * A user has MANY channels
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function channels(){
+        return $this->hasMany(Channel::class);
+    }
+
 }

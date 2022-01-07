@@ -7,7 +7,7 @@ development was completed using a Docker based dev environment that is
 part of the Laravel installation. This may be omitted if you are not 
 using Docker in your development process.
 
-
+---
 # Create new app
 
 For all commands where `xxx` is shown, replace with your initials.
@@ -17,7 +17,7 @@ curl -s https://laravel.build/xxx-yt-clone | bash
 cd xxx-yt-clone 
 sail up
 ```
-
+---
 # Initialise Version Control
 
 We do this in two steps:
@@ -67,7 +67,8 @@ git commit -m "Update the .gitignore to remove unwanted files"
 git push -u origin main
 ```
 
-# Add Base of the UI
+---
+# Add UI Skeleton Code
 
 We are now ready to add the Jetstream UI components...
 
@@ -129,9 +130,11 @@ git commit -m "Default configuration without seed users"
 git push -u origin main
 ```
 
+---
 # Create Model for Channel
 
-This command also creates a migration, factory, seeder, controller and policy for the Channels.
+This command also creates a migration, factory, seeder, controller and 
+policy for the Channels.
 
 ```bash
 sail php artisan make:model Channel -a -r
@@ -152,7 +155,8 @@ Modify/Add the following code:
             $table->string('image')->nullable();
             $table->timestamps();
             
-            $table->foreign('user_id')->references('id')->on('users')->oncascade('delete');
+            $table->foreign('user_id')->references('id')
+                        ->on('users')->oncascade('delete');
         });
 ```
 
@@ -203,19 +207,21 @@ Now run the migration again:
 sail php artisan migrate:fresh --seed
 ```
 
-When a user registers, we want the application to automatically create them a channel based around the user's name and add 'channel'
-to the end.
+When a user registers, we want the application to automatically create 
+them a channel based around the user's name and add 'channel' to the 
+end.
 
 The channel name will be similar to this: `Eileen Dover Public Channel`.
 
 It will have a 'slug' that will be similar to
 `eileen-dover-public-channel`.
 
-This slug will be used to identify the required channel when using a URL similar to
+This slug will be used to identify the required channel when using a URL
+similar to
 `http://yt-clone.com/channels/eileen-dover-public-channel`.
 
-To get the slug to be used for 'routing' we need to edit the Channel model and add the following before the `public function user`
-line:
+To get the slug to be used for 'routing' we need to edit the Channel 
+model and add the following before the `public function user` line:
 
 ```php
     /**
