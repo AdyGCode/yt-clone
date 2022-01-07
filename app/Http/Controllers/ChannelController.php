@@ -15,7 +15,9 @@ class ChannelController extends Controller
      */
     public function index()
     {
-        //
+        $channels = Channel::all();
+        return view('channels.index', compact(['channels']));
+
     }
 
     /**
@@ -58,7 +60,7 @@ class ChannelController extends Controller
      */
     public function edit(Channel $channel)
     {
-        //
+        return view('channels.edit', compact(['channel']));
     }
 
     /**
