@@ -18,6 +18,7 @@ class CreateChannelsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('name');
             $table->string('slug');
+            $table->boolean('public')->default(false);
             $table->string('uid');
             $table->text('description')->nullable();
             $table->string('image')->nullable();

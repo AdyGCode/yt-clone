@@ -16,6 +16,7 @@ class Channel extends Model
         'uid',
         'description',
         'image',
+        'public',
     ];
 
     /**

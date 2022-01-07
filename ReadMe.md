@@ -145,19 +145,20 @@ Go to the `database/migrations` folder and open the file that contains `create_c
 Modify/Add the following code:
 
 ```PHP
-        Schema::create('channels', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->string('name');
-            $table->string('slug');
-            $table->string('uid');
-            $table->text('description')->nullable();
-            $table->string('image')->nullable();
-            $table->timestamps();
-            
-            $table->foreign('user_id')->references('id')
-                        ->on('users')->oncascade('delete');
-        });
+Schema::create('channels', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('user_id');
+    $table->string('name');
+    $table->string('slug');
+    $table->boolean('private')->default(false);
+    $table->string('uid');
+    $table->text('description')->nullable();
+    $table->string('image')->nullable();
+    $table->timestamps();
+
+    $table->foreign('user_id')->references('id')
+        ->on('users')->oncascade('delete');
+});
 ```
 
 Now open the model file for the channel, `Channel.php` that is in the `app/Models` folder.
@@ -168,12 +169,13 @@ Add the following code inside the class definition, and after the `use HasFactor
 
 ```php
     protected $fillable = [
-        'user_id',
         'name',
-        'slug',
-        'uid',
         'description',
         'image',
+        'public',
+        'slug',
+        'uid',
+        'user_id',
     ];
 
     /**
@@ -253,6 +255,7 @@ git commit -m "Base application plus Channel model and migration"
 git push origin main
 ```
 
+---
 # Add Seeder Data
 
 To enable interactive testing, we will add some seed data that we can repeatedly use.
@@ -269,11 +272,28 @@ Now find and open the new file in the `database/seeders` folder.
 
 In the run method we are going to do two things:
 
-1. Create a list of known seed users,
-2. Create the new user plus a public and private channel for each user.
+1. Add required 'uses' statements
+2. Create a list of known seed users,
+3. Create the new user.
+4. Create public and private channels for each user.
+5. Create a 'team' for each user.
 
-### Seed User List
+### Include Required Classes
 
+Before we add the users, we will add the required `uses` statements:
+
+```php
+use App\Models\Channel;
+use App\Models\User;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Team;
+use Str;
+```
+
+We will be making use of these when we seed.
+
+### Define Users
 The seed users are:
 
 ```text
@@ -286,8 +306,9 @@ The seed users are:
 |---------------|--------------------|-----------|
 ```
 
-These are added to an array containing an associative array for each user. The PHP to do this is shown below, and you should add it
-to the run method:
+These are added to an array containing an associative array for each 
+user. The PHP to do this is shown below, and you should add it to the 
+run method:
 
 ```php
 $seedUsers = [
@@ -309,7 +330,7 @@ $seedUsers = [
         ];
 ```
 
-### Seeding loop
+### Seeding Loop
 
 Next we will create the loop that adds each new user, plus creates the channel:
 
@@ -331,9 +352,56 @@ foreach ($seedUsers as $seedUser) {
         }
 ```
 
+### Create Team method
+
+After the seeding loop and just before the closing `}` curly bracket 
+of the class we will add the following code, which creates a new 
+personal team for the user. 
+
+> We may or may not use teams later in the project.
+
+```php
+/**
+ * Create a personal team for the user.
+ *
+ * Taken from the CreateNewUser class and reproduced for simplicity.
+ *
+ * @param  \App\Models\User  $user
+ * @return void
+ */
+protected function createTeam(User $user)
+{
+    $user->ownedTeams()->save(
+        Team::forceCreate([
+              'user_id' => $user->id,
+              'name' => explode(' ', $user->name, 2)[0]."'s Team",
+              'personal_team' => true,
+          ])
+    );
+}
+```
+
 ## Channel Seeder
 
 We do not have any seeding to be added at this time to the channels.
+
+## Add Seeder Calls
+
+Open the `DatabaseSeeder.php` file and modify the code so that it 
+runs the required seeders in turn, starting with User.
+
+The run method becomes:
+
+```php
+public function run()
+{
+    // \App\Models\User::factory(10)->create();
+    $this->call([
+        UserSeeder::class,
+        ChannelSeeder::class,
+                ]);
+}
+```
 
 ## Re-Run the Migrations
 
@@ -354,6 +422,8 @@ git status
 git commit -m "Base application plus Channel model and migration"
 git push origin main
 ```
+
+---
 
 
 
