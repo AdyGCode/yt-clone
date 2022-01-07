@@ -23,11 +23,9 @@ In the account create a new repository, but ensure the following:
 - Make the project private if required
 - Give the repository a suitable name (I used `totally-blank` in the demo image)
 
----
-TODO: Add image here
----
+![Empty Repository Example](docs/images/Empty-Repo-GitHub.png)
 
-Now on your terminal we need to initialise the Repository.  
+Now on your terminal we need to initialise the Repository.
 
 Open a terminal.
 
@@ -38,18 +36,24 @@ Then run the following command sequence.
 
 ```bash
 git init
-git add README.md
+git add ReadMe.md
 git commit -m "first commit"
 git branch -M main
-git remote add origin https://github.com/AdyGCode/yt-clone.git
+git remote add origin URL_TO_YOUR_EMPTY_REMOTE_REPO
 git push -u origin main
 ```
 
-## Edit the .gitignore file
+![Initialiasing the repository](docs/images/ReadMe.png)
+
+## Updating and Committing the .gitignore
 
 Add, or replace the contents of the attached file to the .gitignore file: [.gitignore](.gitignore)
 
-
+```bash
+git add .gitignore
+git commit -m "Update the .gitignore to remove unwanted files"
+git push -u origin main
+```
 
 # Add Base of the UI
 
