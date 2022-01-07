@@ -1,3 +1,13 @@
+# n-Tube Type Clone
+
+**This is a work in progress (WIP) and will regularly be updated.**
+
+This document has the command "sail" used heavily. This is because 
+development was completed using a Docker based dev environment that is 
+part of the Laravel installation. This may be omitted if you are not 
+using Docker in your development process.
+
+
 # Create new app
 
 For all commands where `xxx` is shown, replace with your initials.
@@ -7,7 +17,6 @@ curl -s https://laravel.build/xxx-yt-clone | bash
 cd xxx-yt-clone 
 sail up
 ```
-
 
 # Initialise Version Control
 
@@ -23,21 +32,24 @@ In the account create a new repository, but ensure the following:
 - Make the project private if required
 - Give the repository a suitable name (I used `totally-blank` in the demo image)
 
+Keep the browser open as you are then able to copy the URL and 
+commands as needed.
+
 ![Empty Repository Example](docs/images/Empty-Repo-GitHub.png)
 
-Now on your terminal we need to initialise the Repository.
+### Terminal time
+Open a terminal so that we may initialise the Repository.
 
-Open a terminal.
-
-We usually need TWO terminals when developing, so if you have one open, open a new one and make sure you are in 
-your xxx-yt-clone folder before continuing.
+> We usually need TWO terminals when developing, so if you have one 
+> open, open a new one and make sure you are in your xxx-yt-clone folder
+> before continuing.
 
 Then run the following command sequence.
 
 ```bash
 git init
 git add ReadMe.md
-git commit -m "first commit"
+git commit -m "Initial commit to start repository"
 git branch -M main
 git remote add origin URL_TO_YOUR_EMPTY_REMOTE_REPO
 git push -u origin main
@@ -59,7 +71,8 @@ git push -u origin main
 
 We are now ready to add the Jetstream UI components...
 
-The installation will add registration and other components for the user, plus
+The installation will add registration and other components for the 
+user, plus...
 
 ```bash
 sail php artisan sail:publish
@@ -68,13 +81,20 @@ sail php artisan jetstream:install livewire --teams
 
 sail npm install 
 sail npm run dev
-sail php artisan migrate
-sail php artisan vendor:publish --tag=laravel-mail --tag=laravel-errors --tag=sail --tag=jetstream-views --tag=livewire --tag=livewire:assets --tag=livewire:config --tag=livewire:pagination --tag=sanctum-config
+sail php artisan migrate:fresh --seed
+sail php artisan vendor:publish --tag=laravel-mail --tag=laravel-errors 
+sail php artisan vendor:publish --tag=sail --tag=jetstream-views --tag=livewire 
+sail php artisan vendor:publish --tag=livewire:assets --tag=livewire:config 
+sail php artisan vendor:publish --tag=livewire:pagination --tag=sanctum-config
 ```
-These commands add Laravel Livewire, and then publish the components and some configuration files so that you can directly access 
-and edit customise if required.
 
-Now to add a couple of helpers for the IDE...
+These commands add Laravel Livewire, and then publish the components and
+some configuration files so that you can directly access and edit or
+customise as required.
+
+## IDE Helpers
+
+Now to add a couple of helpers for PhpStorm (possibly other IDEs)...
 
 ```bash
 sail composer require --dev barryvdh/laravel-ide-helper 
@@ -84,19 +104,30 @@ sail php artisan ide-helper:models -W
 sail php artisan ide-helper:meta
 ```
 
-Open the `composer.json` file, and add an entry to the `scripts` area:
+Open the `composer.json` file, and add/modify an entry to the `scripts` 
+area. If the post-update-cmd is already present then add the lines 
+between the `[`square brackets`]`.
 
 ```json
   "post-update-cmd": [
-"Illuminate\\Foundation\\ComposerScripts::postUpdate",
-"@php artisan ide-helper:generate",
-"@php artisan ide-helper:models -W",
-"@php artisan ide-helper:meta"
-]
+      "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+      "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+      "@php artisan ide-helper:generate",
+      "@php artisan ide-helper:models -W",
+      "@php artisan ide-helper:meta"
+  ],
 ```
 
-You will need to make sure you add a `,` to the line ending in a `]` that will be immediately before this new code.
+### Do a Commit and Push to Version Control
 
+Do the usual sequence of adding and pushing to  verison control, 
+with a suitable comment:
+
+```bash
+git add .
+git commit -m "Default configuration without seed users"
+git push -u origin main
+```
 
 # Create Model for Channel
 
