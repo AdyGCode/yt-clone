@@ -38,18 +38,19 @@ class UserSeeder extends Seeder
 
         foreach ($seedUsers as $seedUser) {
             $user = User::create($seedUser);
+            $team = $this->createTeam($user);
             foreach (['Public', 'Private'] as $pubOrPrivate) {
+                $channelName = implode([$user->name, " ", $pubOrPrivate," channel"]);
                 $userChannel = [
                     'user_id' => $user->id,
-                    'name' => implode([$user->name, " ", $pubOrPrivate, " channel"]),
-                    'slug' => Str::slug(implode([$user->name, " ", $pubOrPrivate, " channel"]), '-'),
-                    'public' => $pubOrPrivate === 'Public',
+                    'name' => $channelName,
+                    'slug' => Str::slug($channelName, '-'),
+                    'public'=> $pubOrPrivate==='Public',
                     'uid' => uniqid(true, true),
                     'description' => null,
                     'image' => null,
                 ];
                 $channel = Channel::create($userChannel);
-                $team = $this->createTeam($user);
             }
         }
     }

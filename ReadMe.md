@@ -336,20 +336,22 @@ Next we will create the loop that adds each new user, plus creates the channel:
 
 ```php
 foreach ($seedUsers as $seedUser) {
-            $user = User::create($seedUser);
-            foreach (['Public', 'Private'] as $pubOrPrivate) {
-                $userChannel = [
-                    'user_id' => $user->id,
-                    'name' => implode([$user->name, " ", $pubOrPrivate," channel"]),
-                    'slug' => Str::slug(implode([$user->name, " ", $pubOrPrivate," channel"]), '-'),
-                    'public'=> $pubOrPrivate==='Public',
-                    'uid' => uniqid(true, true),
-                    'description' => null,
-                    'image' => null,
-                ];
-                Channel::create($userChannel);
-            }
-        }
+    $user = User::create($seedUser);
+    $team = $this->createTeam($user);
+    foreach (['Public', 'Private'] as $pubOrPrivate) {
+        $channelName = implode([$user->name, " ", $pubOrPrivate," channel"]);
+        $userChannel = [
+            'user_id' => $user->id,
+            'name' => $channelName,
+            'slug' => Str::slug($channelName, '-'),
+            'public'=> $pubOrPrivate==='Public',
+            'uid' => uniqid(true, true),
+            'description' => null,
+            'image' => null,
+        ];
+        Channel::create($userChannel);
+    }
+}
 ```
 
 ### Create Team method
@@ -411,10 +413,12 @@ Now re-run the migration using:
 sail php artisan migrate:fresh --seed
 ```
 
+![Seeding the users and creating their channels and teams at the 
+same time](docs/images/Seeding-users-channels-teams.png)
+
 ### Add, Commit, Push
 
 Let's add the new code to version control.
-
 
 ```bash
 git add .
