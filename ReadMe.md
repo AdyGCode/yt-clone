@@ -661,7 +661,8 @@ We will edit the section after the `All Channels` and the `</div>`:
 
 </div>
 ```
-You should get a list of the channels shown a little cards. It will 
+
+You should get a list of the channels shown a little cards. It will
 appear slightly different to shown here:
 
 ![](docs/images/channels-index-list.png)
@@ -681,8 +682,8 @@ The Channel Controller will have two methods updated/created:
 
 The edit retrieves the channel details by using Route Model Binding, and
 displays the `edit.blade.php` file to allow the user to edit the
-channel's details. When the user submits the changes the view send the
-request to the site, and the router then calls the required update
+channel's details. When the user submits the changes, the view sends the
+request to the site, and the router then calls the required `update`
 method in the channel controller to perform the changes.
 
 ### Edit Method
@@ -736,7 +737,7 @@ Modify the `authorize`  method to return `true` for the time being.
 ### Channel Policy
 
 Now we can ensure that the channel policy is correctly created. Open
-the `App/Policiies/ChannelPolicy.php` file.
+the `App/Policies/ChannelPolicy.php` file.
 
 Locate the `update` method and alter it to read:
 
@@ -763,7 +764,7 @@ Here is the form (we will build this in a moment):
 
 And when Eileen tried to make changes, we get:
 
-![Channel Editing Denied](docs/images/Edit-Channel-Demied.png)
+![Channel Editing Denied](docs/images/Edit-Channel-Denied.png)
 
 ### Channel Edit Page
 
@@ -777,6 +778,8 @@ blade file in the Resources/views/channels folder by:
 
 > **ASIDE:** You may also right mouse click on the `views` folder,
 > which will allow you to select the `New --> PHP File` step quickly.
+
+#### Basic Application Page starter code
 
 Start by adding the following code:
 
@@ -805,6 +808,8 @@ Start by adding the following code:
 > **NOTE:** This code will become very common for the application, so
 > you may want to create a scratch file with it in, so you can
 > re-use it quickly.
+
+#### Main Content heading
 
 Let's add the 'heading' for the main content area.
 
@@ -851,6 +856,8 @@ Next, immediately after the comment, replace the TEST with:
 </div>
 ```
 
+#### Form components
+
 We are getting there. We now need to add each of the form components.
 
 We require:
@@ -864,5 +871,299 @@ We require:
 
 To give you practice, we will show one of each input type. You will add
 the others as needed.
+
+#### Text field (Channel Name)
+
+Immediately before the `<!--` comment `-->`, and after the `@csrf`, we
+will now add the Channel Name 'component'.
+
+```html
+
+<div class="container mx-auto px-4 py-1 mt-6 flex flex-row">
+  <label for="name" class="flex-none basis-1/4">Name</label>
+  <input type="text"
+         class="flex-1 basis-3/4 @error('name') border-red-500 @enderror"
+         name="name" id="name"
+         value="{{ old('name')?? $channel->name }}"/>
+</div>
+
+@error('name')
+<div class="container mx-auto px-4 py-1 flex flex-row">
+  <span class="flex-none basis-1/4"></span>
+  <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message
+    }}</p>
+</div>
+@enderror
+```
+
+- `{{ old('name')?? $channel->name }}` if the validation (see later)
+  is rejected then the old value is displayed, if no old value, then it
+  defaults to the channel's current name.
+- `@error('name')`...`@enderror` block is activated when an error is
+  sent back after validation. We use it twice, once to make the input
+  control border red, and second to display an error message.
+
+Add a blank line or two to the code (for readability), and then we can
+add the Owner selection.
+
+#### Select box field (Channel Owner)
+
+The select box for the channel owner has a similar error handling to the
+channel name error, except we use our own message, rather than getting "
+user_id" in the message.
+
+The fun part is creating the list of users, and selecting the current
+owner automatically. The code does the following:
+
+- take a list of users (the id and name only)
+- use a blade @foreach macro to loop through each user
+- create an option for the select box, containing:
+  - the value of the user's id,
+  - the text of the user's name, and
+  - if the user is the current owner, we set it to selected
+
+```html
+<!-- Channel Owner -->
+<div class="container mx-auto px-4 py-1 flex flex-row">
+  <label for="user_id" class="flex-none basis-1/4">Owner</label>
+  <select name="user_id" id="user_id"
+          class="flex-1 basis-3/4 @error('user_id') border-red-500 @enderror ">
+    @foreach($users as $user)
+    <option value="{{$user->id}}"
+            @if( $user->id === (old('user_id')?? auth()->user()->id)
+      ) selected
+      @endif >
+      {{$user->name}}
+    </option>
+    @endforeach
+  </select>
+</div>
+
+@error('user_id')
+<div class="container mx-auto px-4 py-1 flex flex-row">
+  <span class="flex-none basis-1/4"></span>
+  <p class="sm text-red-500 py-1 flex-1 basis-3/4">
+    Error: Channel owner must be selected
+  </p>
+</div>
+@enderror
+```
+
+#### Checkbox field (Channel Private/Public)
+
+Next we can look at the Toggle button...
+
+This is achieved by doing a bit of work in the form, but we use CSS to
+tweak it. More on the CSS tweak at the end of this section.
+
+```html
+<!-- Channel Public/Private -->
+<div class="container mx-auto px-4 py-1 flex flex-row">
+  <label for="public" class="flex-none basis-1/4">Public</label>
+
+  <div class="flex-0 cursor-pointer relative shadow-sm">
+    <input aria-label="public toggle" type="checkbox" name="public"
+           id="public"
+           class="focus:outline-none focus:bg-stone-500 focus:ring-2 focus:ring-offset-2
+               focus:ring-stone-700
+                      checkbox w-6 h-6 rounded bg-white absolute m-1 shadow-sm appearance-none
+                      cursor-pointer"
+           @if( old('public')?? $channel->public ) checked @endif />
+    <label for="public" class="toggle-label block w-16 h-8 overflow-hidden rounded bg-stone-300
+        dark:bg-stone-700 cursor-pointer"></label>
+  </div>
+</div>
+
+@error('public')
+<div class="container mx-auto px-4 py-1 flex flex-row">
+  <span class="flex-none basis-1/4"></span>
+  <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message
+    }}</p>
+</div>
+@enderror
+```
+
+#### Text area field (Channel Description)
+
+We are almost there. The other input type is the text area, so let's hit
+the description field.
+
+```html
+<!-- Channel Description -->
+<div class="container mx-auto my-1 px-4 py-1 flex flex-row border border-0 border-b-1 border-stone-200">
+  <label for="description"
+         class="flex-none basis-1/4">Description</label>
+  <textarea id="description" name="description"
+            class="flex-1 basis-3/4 @error('description') border-red-500 @enderror"
+  >{{ old('description')?? $channel->description }}</textarea>
+</div>
+
+@error('description')
+<div class="container mx-auto px-4 py-1 flex flex-row">
+  <span class="flex-none basis-1/4"></span>
+  <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message
+    }}</p>
+</div>
+@enderror
+```
+
+Note that the content of the `<textarea ...>`...`</textarea>` has
+**no** whitespace between the `>` and the `<`. This is very important as
+the whitespace will stop the content being shown correctly.
+
+#### Buttons
+
+The last section is the buttons,and here is the code to create them:
+
+```html
+<!-- Submission Buttons -->
+<div class="container mx-auto px-4 py-1 my-6 mb-4 flex flex-row gap-4">
+  <span class="basis-1/4 flex-none"></span>
+  <button type="submit" name="button"
+          class="rounded p-1 px-4 border border-1 -ml-4
+               border-green-700 bg-green-100 text-green-700
+               hover:border-green-900 hover:bg-green-500 hover:text-green-50
+               focus:border-green-900 focus:bg-green-500 focus:text-green-50 focus:outline-none
+               animation ease-in-out duration-300">Save Changes
+  </button>
+
+  <a href="{{ route('channels.index') }}"
+     class="rounded p-1 px-4 border border-1
+          border-stone-300 bg-stone-50 text-stone-500
+          hover:border-stone-900 hover:bg-stone-500 hover:text-stone-50
+          focus:border-stone-900 focus:bg-stone-500 focus:text-stone-50 focus:outline-none
+          animation ease-in-out duration-300">Cancel</a>
+
+</div>
+```
+
+Note that the code you have here may be different from repository code
+as we modify/update as needed. Careful about copying repository code as
+it may break the application.
+
+### The CSS Tweak!
+
+Open the `resources/css/app.css` file, and modify by adding customised
+CSS code. We are extending Tailwind here, and you may get an idea of how
+you could create a version of 'Bootstrap' or
+'Foundation' using the Tailwind system.
+
+```css
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer components {
+  .checkbox:checked {
+    @apply right-0;
+  }
+
+  .checkbox:checked + .toggle-label {
+    @apply bg-stone-700;
+  }
+}
+```
+
+The above adds two new 'components' for when the checkbox is ticked.
+When the checkbox that forms the toggle is clicked, it will move the
+checkbox over to the opposite side.
+
+TailwindCSS lets you define custom CSS and more using this method.
+The `@apply` lets you use any of the classes built into Tailwind as
+building blocks to your own classes.
+
+Any changes you make need to be 'compiled' and this is where having
+`npm run watch` sitting in the background works its magic. Having that
+running means any time a file is changed and saved (CSS, JS, HTML, PHP)
+within the `resources` folder, the script does it job.
+
+The script monitors and searches the `*.blade.php`, `*.php`
+files in some locations ([tailwind.config.css](tailwind.config.css)
+file contains the locations), plus the `app.css` and `app.js` files
+(details in the [webpack.mix.js](webpack.mix.js) file), extracts the
+classes used, and compiles the updated CSS and JS code and places it in
+the relevant `public` folder.
+
+## EXERCISE: Complete the Edit page
+
+Using the code above as a guide, complete the form as shown below
+(or close to it):
+
+![Channel edit form before submit](docs/images/Channel-edit-form-before-submit.png)
+
+When you have an error the form will look similar to the image shown
+below:
+
+![Channel edit form after submit](docs/images/Channel-edit-form-after-submit.png)
+
+> **NOTE:** The form is not 100% accessible, so there is work to do on
+> that.
+>
+> Also, at this time we are not uploading any files to the application.
+
+## EXERCISE: Complete the Add and Store actions
+
+Using the steps previously defined, create:
+
+- the `add.blade.php` view
+- create the `create` method in the ChannelsController.php file
+- create the `store` method in the ChannelsController.php file
+- update the `authorize` and `rules` methods in the
+  `StoreChannelRequest.php` file.
+
+The main items to be aware of will be in the view and the `store`
+method.
+
+The open form code will not need the channel to be passed, nor will it
+need a `@method` override:
+
+```html
+
+<form action="{{route('channels.store')}}" method="post">
+  @csrf
+```
+
+The `value="..."` on the controls will not need to refer to channel. For
+example, we only need to use the `old` function:
+
+```html
+    value="{{ old('name') }}"
+```
+
+The `option` in the select controle, will use the currently logged in
+user by default:
+
+```html
+
+<option value="{{$user->id}}"
+        @if( $user->id === (old('user_id')?? auth()->user()->id) )
+  selected @endif>
+  {{$user->name}}
+</option>
+```
+
+The `store` method will look similar to this:
+
+```php
+public function store(StoreChannelRequest $request)
+{
+    Channel::create( [
+            'name' => $request->name,
+            'user_id' => $request->user_id,
+            'slug' => Str::slug($request->slug),
+            'uid' => uniqid(true, true),
+            'description' => $request->description,
+            'private' => $request->private ? true : false,
+            'image' => $request->image ?? 'video.png',
+        ]);
+
+    return redirect()
+        ->route('channels.index')
+        ->banner('Channel added successfully.');
+}
+```
+
+
+
 
 
