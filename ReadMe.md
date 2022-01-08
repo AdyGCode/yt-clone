@@ -582,7 +582,7 @@ private channels owned by the user.
 
 Create a new folder inside `resources/views` called `channels`.
 
-Then create ale called `index.blade.php` inside the
+Then create aa file called `index.blade.php` inside the
 `resources/views/channels` folder.
 
 > **SHORTCUT :** We can create the folder and the file in one step
@@ -618,7 +618,7 @@ The `x-app-layout` tells Laravel to use the `layouts/app.blade.php`
 template file as the base for this page, and then insert content as
 needed.
 
-### Checking page renders
+### Checking Page Renders
 
 Open the browser, open the site (http://localhost for sail users), and
 then log-in using the administrator user.
@@ -626,13 +626,14 @@ then log-in using the administrator user.
 Next, once the user is logged in, edit the URL to be
 `http://localhost/channels/` and you should see:
 
-![](docs/images/channels-index-1.png)
+![Testing the channels home page](docs/images/channels-index-1.png)
 
 ### Actually Displaying the Channels
 
 Next we will update the view so that it lists the channels.
 
-We will edit the section after the `All Channels` and the `</div>`:
+We will edit the section after the `All Channels` and the `</div>`
+by adding the `foreach` that will process each channel in turn:
 
 ```php
 <div class="container mx-auto grid lg:grid-cols-3 xl:grid-cols-4 p-4 gap-4">
