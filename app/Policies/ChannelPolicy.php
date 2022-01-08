@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Channel;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class ChannelPolicy
 {
@@ -18,7 +19,7 @@ class ChannelPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return Response::allow();
     }
 
     /**
@@ -30,7 +31,8 @@ class ChannelPolicy
      */
     public function view(User $user, Channel $channel)
     {
-        //
+        return Response::allow();
+        return $channel->belongsToUser($user);
     }
 
     /**
@@ -41,7 +43,7 @@ class ChannelPolicy
      */
     public function create(User $user)
     {
-        //
+        return Response::allow();
     }
 
     /**
@@ -53,7 +55,12 @@ class ChannelPolicy
      */
     public function update(User $user, Channel $channel)
     {
-        //
+        // TODO: Check if user is Admin OR the Channel Owner.
+        //       Currently, prescribe user #1 (admin in dummy data)
+        //       and the logged in user if they are the channel owner
+        return $user->id === $channel->user_id || $user->id === 1
+            ? Response::allow()
+            : Response::deny('You do not own this channel.');
     }
 
     /**
@@ -65,7 +72,9 @@ class ChannelPolicy
      */
     public function delete(User $user, Channel $channel)
     {
-        //
+        ddd($this);
+
+        return Response::allow();
     }
 
     /**
@@ -77,7 +86,9 @@ class ChannelPolicy
      */
     public function restore(User $user, Channel $channel)
     {
-        //
+        ddd($this);
+
+        return Response::allow();
     }
 
     /**
@@ -89,6 +100,10 @@ class ChannelPolicy
      */
     public function forceDelete(User $user, Channel $channel)
     {
-        //
+        ddd($this);
+
+        return Response::allow();
     }
+
+    // TODO: Add the removeChannelVideo, updateChannelVideo, addChannelVideo policies
 }

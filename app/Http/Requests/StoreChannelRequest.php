@@ -13,7 +13,7 @@ class StoreChannelRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,10 @@ class StoreChannelRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            "name" => ['required', 'min:4'],
+            'slug' => ['required', 'min:4', 'unique:channels,slug'],
+            'public' => ['nullable',],
+            'description' => ['nullable', 'max:4096'],
         ];
     }
 }

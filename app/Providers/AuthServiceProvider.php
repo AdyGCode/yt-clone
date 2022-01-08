@@ -2,8 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Channel;
 use App\Models\Team;
+use App\Policies\ChannelPolicy;
 use App\Policies\TeamPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -14,6 +17,8 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
+        # ModelName::class => ModelNamePolicy::class,
+        Channel::class => ChannelPolicy::class,
         Team::class => TeamPolicy::class,
     ];
 
@@ -25,7 +30,5 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-
-        //
     }
 }

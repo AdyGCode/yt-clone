@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Symfony\Component\Console\Helper\ProgressBar;
 
 class ChannelSeeder extends Seeder
 {

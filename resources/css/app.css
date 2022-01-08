@@ -1,3 +1,14 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+@layer components {
+
+    .checkbox:checked {
+        @apply right-0;
+    }
+
+    .checkbox:checked + .toggle-label {
+        @apply bg-stone-700;
+    }
+}

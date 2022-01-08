@@ -11,9 +11,9 @@ class UpdateChannelRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
-        return false;
+        return true; // allow everyone to edit every channel (temp)
     }
 
     /**
@@ -24,7 +24,10 @@ class UpdateChannelRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            "name" => ['required', 'min:4'],
+            'slug' => ['required', 'min:4', 'unique:channels,slug,'.$this->channel->id],
+            'public' => ['nullable', 'boolean',],
+            'description' => ['nullable', 'max:4096'],
         ];
     }
 }

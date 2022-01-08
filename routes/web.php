@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChannelController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -22,6 +23,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
-    Route::resource('channels', \App\Http\Controllers\ChannelController::class);
-
+    Route::resource('channels', ChannelController::class);
+    Route::get('channels/{channel}/delete', [ChannelController::class, "delete"])->name('channels.delete');
 });

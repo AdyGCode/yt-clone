@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class TeamPolicy
 {
@@ -57,6 +58,18 @@ class TeamPolicy
     }
 
     /**
+     * Determine whether the user can delete the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Team  $team
+     * @return mixed
+     */
+    public function delete(User $user, Team $team)
+    {
+        return $user->ownsTeam($team);
+    }
+
+    /**
      * Determine whether the user can add team members.
      *
      * @param  \App\Models\User  $user
@@ -88,18 +101,6 @@ class TeamPolicy
      * @return mixed
      */
     public function removeTeamMember(User $user, Team $team)
-    {
-        return $user->ownsTeam($team);
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\Team  $team
-     * @return mixed
-     */
-    public function delete(User $user, Team $team)
     {
         return $user->ownsTeam($team);
     }

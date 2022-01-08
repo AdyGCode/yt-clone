@@ -11,49 +11,63 @@
 
                 <div class="p-4 bg-stone-700">
                     <h3 class="text-2xl text-bold text-stone-200">
-                        Edit Channel
+                        Add Channel
                     </h3>
                 </div>
 
                 <div class="container mx-auto p-4 pt-6 gap-4">
 
-                    <form action="{{route('channels.update', ['channel'=>$channel])}}"
+                    <form action="{{route('channels.store')}}"
                           method="post">
-                        @method('PATCH')
                         @csrf
 
                         <div class="container mx-auto px-4 py-1 mt-6 flex flex-row">
                             <label for="name" class="flex-none basis-1/4">Name</label>
-                            <input type="text" class="flex-1 basis-3/4"
+                            <input type="text" class="flex-1 basis-3/4 @error('name') border-red-500 @enderror"
                                    name="name" id="name"
-                                   value="{{ old('name')?? $channel->name }}"/>
-                            @error('name')
-                            <p class="sm text-red-500 py-2">Error in name</p>
-                            @enderror
+                                   value="{{ old('name') }}"/>
                         </div>
+
+                        @error('name')
+                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                        </div>
+                        @enderror
 
                         <div class="container mx-auto px-4 py-1 flex flex-row">
                             <label for="user_id" class="flex-none basis-1/4">Owner</label>
-                            <select name="user_id" id="user_id" class="flex-1 basis-3/4">
+                            <select name="user_id" id="user_id" class="flex-1 basis-3/4 @error('user_id') border-red-500 @enderror">
                                 @foreach($users as $user)
                                     <option value="{{$user->id}}"
-                                            @if($user->id === (old('user_id')?? $channel->user_id))selected @endif>{{$user->name}}</option>
+                                            @if($user->id === (old('user_id')?? auth()->user()->id))selected @endif>
+                                        {{$user->name}}
+                                    </option>
                                 @endforeach
                             </select>
-                            @error('user_id')
-                            <p class="sm text-red-500 py-2">Error in user</p>
-                            @enderror
                         </div>
+
+
+                        @error('user_id')
+                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: Channel owner must be selected</p>
+                        </div>
+                        @enderror
 
                         <div class="container mx-auto px-4 py-1 flex flex-row">
                             <label for="slug" class="flex-none basis-1/4">Slug</label>
-                            <input type="text" class="flex-1 basis-3/4"
+                            <input type="text" class="flex-1 basis-3/4 @error('slug') border-red-500 @enderror"
                                    name="slug" id="slug"
-                                   value="{{ old('slug')?? $channel->slug }}"/>
-                            @error('slug')
-                            <p class="sm text-red-500 py-2">Error in slug</p>
-                            @enderror
+                                   value="{{ old('slug') }}"/>
                         </div>
+
+                        @error('slug')
+                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                        </div>
+                        @enderror
 
                         <div class="container mx-auto px-4 py-1 flex flex-row">
                             <label for="public" class="flex-none basis-1/4">Public</label>
@@ -63,34 +77,46 @@
                                        class="focus:outline-none focus:bg-indigo-500 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700
                                               checkbox w-6 h-6 rounded bg-white absolute m-1 shadow-sm appearance-none
                                               cursor-pointer"
-                                       @if(old('public')?? $channel->public) checked @endif />
+                                       @if(old('public')) checked @endif />
                                 <label for="public" class="toggle-label block w-16 h-8 overflow-hidden rounded bg-gray-300
                                 dark:bg-gray-700 cursor-pointer"></label>
                             </div>
-                            @error('public')
-                            <p class="sm text-red-500 py-2">Error in public</p>
-                            @enderror
                         </div>
+
+                        @error('public')
+                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                        </div>
+                        @enderror
 
                         <div class="container mx-auto my-1 px-4 py-1 flex flex-row border border-0 border-b-1 border-stone-200">
                             <label for="description" class="flex-none basis-1/4">Description</label>
                             <textarea id="description" name="description"
-                                      class="flex-1 basis-3/4">{{ old('description')?? $channel->description }}</textarea>
-                            @error('description')
-                            <p class="sm text-red-500 py-2">Error in description</p>
-                            @enderror
+                                      class="flex-1 basis-3/4 @error('description') border-red-500 @enderror"
+                            >{{ old('description') }}</textarea>
                         </div>
+
+                        @error('description')
+                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                        </div>
+                        @enderror
 
                         <div class="container mx-auto px-4 py-1 mb-6 flex flex-row">
                             <label for="image" class="flex-none basis-1/4">Channel Image</label>
-                            <input type="text" class="flex-1 basis-3/4"
+                            <input type="text" class="flex-1 basis-3/4 @error('image') border-red-500 @enderror"
                                    name="image" id="image"
-                                   value="{{ old('image')?? $channel->image }}"/>
-                            @error('image')
-                            <p class="sm text-red-500 py-2">Error in image</p>
-
-                            @enderror
+                                   value="{{ old('image')?? 'video.png' }}"/>
                         </div>
+
+                        @error('image')
+                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                        </div>
+                        @enderror
 
 
                         <div class="container mx-auto px-4 py-1 my-6 mb-4 flex flex-row gap-4">

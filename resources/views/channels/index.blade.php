@@ -9,36 +9,48 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg ">
 
-                <div class="p-4 bg-zinc-200 ">
-                    <h1>All Channels</h1>
+                <div class="p-4 bg-stone-700">
+                    <h3 class="text-2xl text-bold text-stone-200">
+                        All Channels
+                    </h3>
                 </div>
 
                 <div class="container mx-auto grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 p-4 pt-6 gap-4">
 
                     @foreach($channels as $channel)
-                        <div class="rounded border-1 shadow p-1px
-                                    bg-zinc-50 dark:bg-zinc-800 border-zinc-400 dark:border-zinc-600 ">
-                            <div class="p-4 sm:p-5">
-                                <p class="text-zinc-300 p-0 m-0">ICON HERE</p>
+                        <div class="rounded border border-stone-400 border-1 rounded shadow
+                                    bg-stone-50 dark:bg-stone-800 ">
+                            <div class="p-4 rounded">
                                 <p tabindex="0"
-                                   class="focus:outline-none text-base leading-5 pt-6 text-zinc-700 dark:text-zinc-100">
-                                   {{$channel->name}}
+                                   class="focus:outline-none text-base leading-5 -m-4 mb-2 rounded-t p-4
+                                            text-stone-50 bg-stone-500 border-1 border-stone-400">
+                                    {{$channel->name}}
                                 </p>
-                                <div class="flex items-center justify-between pt-4">
-                                    <a href="#"
-                                       class="rounded p-1 px-4 bg-blue-200 hover:bg-blue-500 hover:text-zinc-50
-                                              focus:bg-blue-500 focus:text-zinc-50 animation ease-in-out duration-150
-                                              focus:outline-none"
+
+                                <p class="text-stone-600 p-0 m-0 h-32">
+                                    <img src="{{ asset('images/'.($channel->image ?? "video.png")) }}"
+                                         class="mx-auto max-h-32 rounded-lg" alt="cover image for {{$channel->name}}">
+                                </p>
+
+                                <div class="flex items-center pt-4">
+                                    <a href="{{route('channels.show', ['channel'=>$channel])}}"
+                                       class="rounded p-1 px-4 mr-4 border border-1
+                                          border-blue-500 bg-blue-50 text-blue-900
+                                          hover:border-blue-900 hover:bg-blue-500 hover:text-blue-50
+                                          focus:border-blue-900 focus:bg-blue-500 focus:text-blue-50 focus:outline-none
+                                          animation ease-in-out duration-300"
                                        role="button">
-                                       Details
+                                        Details
                                     </a>
                                     @auth()
-                                        <a href="#"
-                                           class="rounded p-1 px-4 bg-amber-200 hover:bg-amber-500 hover:text-zinc-50
-                                                  focus:bg-amber-500 focus:text-zinc-50 animation ease-in-out duration-150
-                                                  focus:outline-none"
+                                        <a href="{{route('channels.edit', ['channel'=>$channel])}}"
+                                           class="rounded p-1 px-4 border border-1
+                                              border-stone-300 bg-stone-50 text-stone-500
+                                              hover:border-stone-900 hover:bg-stone-500 hover:text-stone-50
+                                              focus:border-stone-900 focus:bg-stone-500 focus:text-stone-50 focus:outline-none
+                                              animation ease-in-out duration-300"
                                            role="button">
-                                           Edit
+                                            Edit
                                         </a>
                                     @endauth
                                 </div>

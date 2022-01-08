@@ -13,10 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->command->info('');
+        $this->command->info('Database seeding starting..');
+
         // \App\Models\User::factory(10)->create();
         $this->call([
-            UserSeeder::class,
-            ChannelSeeder::class,
+                        UserSeeder::class,
+                        ChannelSeeder::class,
                     ]);
     }
+
 }

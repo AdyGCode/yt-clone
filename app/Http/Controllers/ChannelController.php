@@ -5,9 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreChannelRequest;
 use App\Http\Requests\UpdateChannelRequest;
 use App\Models\Channel;
+use App\Models\User;
+use Str;
 
 class ChannelController extends Controller
 {
+
+
+    public function __construct()
+    {
+        $this->authorizeResource(Channel::class);
+
+        // Post::class is the model to lookup the policy
+        // post - parameter name, explained w/ can middleware
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,8 +28,8 @@ class ChannelController extends Controller
     public function index()
     {
         $channels = Channel::all();
-        return view('channels.index', compact(['channels']));
 
+        return view('channels.index', compact(['channels']));
     }
 
     /**
@@ -27,7 +39,8 @@ class ChannelController extends Controller
      */
     public function create()
     {
-        //
+        $users = User::all(['id', 'name']);
+        return view('channels.add', compact(['users']));
     }
 
     /**
@@ -38,7 +51,17 @@ class ChannelController extends Controller
      */
     public function store(StoreChannelRequest $request)
     {
-        //
+        Channel::create([
+                            'name' => $request->name,
+                            'user_id' => $request->user_id,
+                            'slug' => Str::slug($request->slug),
+                            'uid' => uniqid(true, true),
+                            'description' => $request->description,
+                            'private' => $request->private ? true : false,
+                            'image' => $request->image ?? 'video.png',
+                        ]);
+
+        return redirect()->route('channels.index')->banner('Channel added successfully.');
     }
 
     /**
@@ -49,7 +72,7 @@ class ChannelController extends Controller
      */
     public function show(Channel $channel)
     {
-        //
+        return view('channels.show', compact(['channel']));
     }
 
     /**
@@ -60,7 +83,8 @@ class ChannelController extends Controller
      */
     public function edit(Channel $channel)
     {
-        return view('channels.edit', compact(['channel']));
+        $users = User::all(['id', 'name']);
+        return view('channels.edit', compact(['channel', 'users']));
     }
 
     /**
@@ -71,6 +95,25 @@ class ChannelController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateChannelRequest $request, Channel $channel)
+    {
+        $channel->update([
+                             'name' => $request->name,
+                             'user_id' => $request->user_id,
+                             'slug' => Str::slug($request->slug),
+                             'description' => $request->description,
+                             'image' => $request->image,
+                         ]);
+
+        return redirect()->route('channels.index')->banner('Channel updated successfully.');
+    }
+
+    /**
+     * Verify the removal of the specified resource from storage.
+     *
+     * @param  \App\Models\Channel  $channel
+     * @return \Illuminate\Http\Response
+     */
+    public function delete(Channel $channel)
     {
         //
     }

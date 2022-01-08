@@ -47,7 +47,7 @@ as needed.
 
 ### Terminal time
 
-Open a terminal so that we may initialise the Repository.
+Open a second terminal so that we may initialise the Repository.
 
 > We usually need TWO terminals when developing, so if you have one
 > open, open a new one and make sure you are in your xxx-yt-clone folder
@@ -64,7 +64,7 @@ git remote add origin URL_TO_YOUR_EMPTY_REMOTE_REPO
 git push -u origin main
 ```
 
-![Initialiasing the repository](docs/images/ReadMe.png)
+![Initialising the repository](docs/images/ReadMe.png)
 
 ## Updating and Committing the .gitignore
 
@@ -107,9 +107,10 @@ customise as required.
 ## IDE Helpers
 
 Now to add a couple of helpers for PhpStorm (possibly other IDEs)...
+plus a debugging bar (shown on the browser) whilst we are developing.
 
 ```bash
-sail composer require --dev barryvdh/laravel-ide-helper 
+sail composer require --dev barryvdh/laravel-ide-helper barryvdh/laravel-debugbar
 sail php artisan clear-compiled
 sail php artisan ide-helper:generate
 sail php artisan ide-helper:models -W
@@ -117,22 +118,22 @@ sail php artisan ide-helper:meta
 ```
 
 Open the `composer.json` file, and add/modify an entry to the `scripts`
-area. If the post-update-cmd is already present then add the lines
+area. If the `post-update-cmd` is already present then add the lines
 between the `[`square brackets`]`.
 
-```json
-  "post-update-cmd": [
-"Illuminate\\Foundation\\ComposerScripts::postUpdate",
-"@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-"@php artisan ide-helper:generate",
-"@php artisan ide-helper:models -W",
-"@php artisan ide-helper:meta"
+```text
+"post-update-cmd": [
+  "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+  "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+  "@php artisan ide-helper:generate",
+  "@php artisan ide-helper:models -W",
+  "@php artisan ide-helper:meta"
 ],
 ```
 
 ### Do a Commit and Push to Version Control
 
-Do the usual sequence of adding and pushing to verison control, with a
+Do the usual sequence of adding and pushing to version control, with a
 suitable comment:
 
 ```bash
@@ -313,6 +314,15 @@ use Str;
 
 We will be making use of these when we seed.
 
+> **IMPORTANT:** One of the most common errors in using a framework
+> such as Laravel is forgetting to include the required classes when
+> they are used.
+>
+> The next issue you will encounter is selecting the
+> correct class to include. All frameworks have their own ideas and
+> structures and idiosyncrasies that take time to get used to, and
+> even then they throw a curveball from time to time.
+
 ### Define Users
 
 The seed users are:
@@ -333,22 +343,22 @@ run method:
 
 ```php
 $seedUsers = [
-            [
+        [
             'name'=>'Administrator',
             'email'=>'admin@example.com',
             'password'=>Hash::make('Password1'),
-                ],
-            [
+        ],
+        [
             'name'=>'Eileen Dover',
             'email'=>'eileen@example.com',
             'password'=>Hash::make('Password1'),
-                ],
-            [
+        ],
+        [
             'name'=>'Russel Leaves',
             'email'=>'russel@example.com',
             'password'=>Hash::make('Password1'),
-                ],
-        ];
+        ],
+    ];
 ```
 
 ### Seeding Loop
@@ -367,7 +377,8 @@ foreach ($seedUsers as $seedUser) {
             'name' => $channelName,
             'slug' => Str::slug($channelName, '-'),
             'public'=> $pubOrPrivate==='Public',
-            'uid' => uniqid(true, true),
+            'uid' => uniqid("some-unique-prefix-with-many-characters", 
+            true),
             'description' => null,
             'image' => null,
         ];
@@ -517,7 +528,50 @@ Views are contained in the `resources/views` folder.
 We place the views for model that requires them, into a folder in this
 location.
 
-## Channels Index
+## Channels Views and Controller Methods
+
+- Controllers are found in `app/Http/Controllers`
+- Views are contained in `resources/views`
+
+The two components make up a vital part of the MVC architecture that  
+Laravel is based upon.
+
+### Channels Controller: Index Method
+
+Before we create the index blade file, we will edit the Channels
+controller. Locate the `ChannelsController` in
+the `app/Http/Controllers` folder, and open it for editing.
+
+In this file you will find stub methods ready for you to use, such as
+the one below:
+
+```php
+/**
+ * Display a listing of the resource.
+ *
+ * @return \Illuminate\Http\Response
+ */
+public function index()
+{
+    //
+}
+```
+
+Modify this index method to read:
+
+```php
+public function index()
+{
+    $channels = Channel::all();
+    return view('channels.index', compact(['channels']));
+}
+```
+
+This reads all the channels from the channel data source (via the model)
+, and then sends them to the channels index view page (to be added next)
+for display.
+
+### Channels Views: Index
 
 To provide us with the first part of our layout, we will create an index
 page for the channels, but we will make it display all channels, both
@@ -552,7 +606,7 @@ look similar to the current layout.
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
-                <h1>INDEX: Do NOTHING Yet</h1>
+                <h3 class="text-2xl text-bold text-stone-700 pb-4">INDEX: Do NOTHING Yet</h3>
 
             </div>
         </div>
@@ -560,8 +614,11 @@ look similar to the current layout.
 </x-app-layout>
 ```
 
-The `x-app-layout` tells Laravel to use the layouts/app.blade.php file
-as the base for this page, and then insert content as needed.
+The `x-app-layout` tells Laravel to use the `layouts/app.blade.php`
+template file as the base for this page, and then insert content as
+needed.
+
+### Checking page renders
 
 Open the browser, open the site (http://localhost for sail users), and
 then log-in using the administrator user.
@@ -571,8 +628,11 @@ Next, once the user is logged in, edit the URL to be
 
 ![](docs/images/channels-index-1.png)
 
-Next we will list the channels by editing this view, concentrating on
-the part after the `All Channels`:
+### Actually Displaying the Channels
+
+Next we will update the view so that it lists the channels.
+
+We will edit the section after the `All Channels` and the `</div>`:
 
 ```php
 <div class="container mx-auto grid lg:grid-cols-3 xl:grid-cols-4 p-4 gap-4">
@@ -581,7 +641,7 @@ the part after the `All Channels`:
         <div class="rounded border-1 shadow">
             <div class="p-4 sm:p-5">
                 <p tabindex="0"
-                   class="focus:outline-none text-base leading-5 pt-6 text-zinc-700">
+                   class="focus:outline-none text-base leading-5 pt-6 text-stone-700">
                    {{$channel->name}}
                 </p>
                 <div class="flex items-center justify-between pt-4">
@@ -610,34 +670,199 @@ We will modify the edit and details buttons later.
 
 ## Edit
 
-Locate the `ChannelsController` in the `app/Http/Controllers` folder,
-and open it for editing.
+As with the index, we need to add the required code to the Channel
+Controller, and create a View. We also need to update the Update Channel
+Request and Channel Policy settings.
 
-In this file you will find stub methods ready for you to use, such as
-the one below:
+The Channel Controller will have two methods updated/created:
 
-```php
-/**
- * Display a listing of the resource.
- *
- * @return \Illuminate\Http\Response
- */
-public function index()
-{
-    //
-}
-```
+- edit and
+- update.
 
-Locate the `edit` method and modify to become:
+The edit retrieves the channel details by using Route Model Binding, and
+displays the `edit.blade.php` file to allow the user to edit the
+channel's details. When the user submits the changes the view send the
+request to the site, and the router then calls the required update
+method in the channel controller to perform the changes.
+
+### Edit Method
+
+Locate the `edit` method in the `ChannelsController` and modify to
+become:
 
 ```php
 public function edit(Channel $channel)
 {
-    return view('channels.edit', compact(['channel']));
+    $users = User::all(['id','name']);
+    return view('channels.edit', compact(['channel', 'users']));
 }
 ```
 
 This method will open the channels/edit view
-(`resources/views/channels/edit.blade.php`) sending the channel details
-to the view for display. 
+(`resources/views/channels/edit.blade.php`) sending a list of the users
+and the channel details to the view for display, and the user to edit.
+
+### Update Method
+
+Now we can write the code for the update.
+
+```php
+public function update(UpdateChannelRequest $request, Channel $channel)
+{
+    $channel->update([
+                         'name' => $request->name,
+                         'user_id' => $request->user_id,
+                         'slug' => Str::slug($request->slug),
+                         'description' => $request->description,
+                         'image' => $request->image,
+                     ]);
+
+    return redirect()->route('channels.index')
+               ->banner('Channel updated successfully.');
+}
+```
+
+Just a minute, no validation... well, we will come to that.
+
+### Update Channel Request
+
+Next we need to add the update channel request code.
+
+Locate the file `app/Http/Requests/UpdateChannelRequest.php` and open it
+for editing.
+
+Modify the `authorize`  method to return `true` for the time being.
+
+### Channel Policy
+
+Now we can ensure that the channel policy is correctly created. Open
+the `App/Policiies/ChannelPolicy.php` file.
+
+Locate the `update` method and alter it to read:
+
+```php
+public function update(User $user, Channel $channel)
+    {
+        // TODO: Check if user is Admin OR the Channel Owner.
+        //       Currently, prescribe user #1 (admin in dummy data) 
+        //       and the logged in user if they are the channel owner
+        return $user->id === $channel->user_id || $user->id ===1 
+            ? Response::allow()
+            : Response::deny('You do not own this channel.');
+    }
+```
+
+This version of the update method checks if the user who is making the
+request is the owner of the channel, or if it is the admin user
+(#1 in sample data), if so, the response is allowed. Otherwise, a denied
+response is sent with an error message.
+
+Here is the form (we will build this in a moment):
+
+![The Edit Channel Form](docs/images/Editing-Channel-Form-01.png)
+
+And when Eileen tried to make changes, we get:
+
+![Channel Editing Denied](docs/images/Edit-Channel-Demied.png)
+
+### Channel Edit Page
+
+We are finally ready to create our channel editing form. Create a new
+blade file in the Resources/views/channels folder by:
+
+- clicking on the `views` folder in `Resources`
+- Use `File --> New --> PHP File`, and
+- Enter the following in the dialog `channels/edit.blade.php` and
+  pressing `ENTER`
+
+> **ASIDE:** You may also right mouse click on the `views` folder,
+> which will allow you to select the `New --> PHP File` step quickly.
+
+Start by adding the following code:
+
+```html
+
+<x-app-layout>
+  <x-slot name="header">
+    <h2 class="font-semibold text-xl text-stone-800 leading-tight">
+      {{ __('Channels') }}
+    </h2>
+  </x-slot>
+
+  <div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+      <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg ">
+
+        <!-- Main Page Code to go here -->
+        TEST
+
+      </div>
+    </div>
+  </div>
+</x-app-layout>
+```
+
+> **NOTE:** This code will become very common for the application, so
+> you may want to create a scratch file with it in, so you can
+> re-use it quickly.
+
+Let's add the 'heading' for the main content area.
+
+Just above the `<-- Main ... -->` comment, add the following:
+
+```html
+
+<div class="p-4 bg-stone-700">
+  <h3 class="text-2xl text-bold text-stone-200">
+    Edit Channel
+  </h3>
+</div>
+ ```
+
+This will create a header at the top of the 'page card'.
+
+Next, add the form wrapping code, just after the previous code, and
+before the comment.
+
+```html
+
+<div class="container mx-auto p-4 pt-6 gap-4">
+
+  <form action="{{route('channels.update', ['channel'=>$channel])}}"
+        method="post">
+    @method('PATCH')
+    @csrf
+```
+
+- `route(...)` generates the correct URI for the form to use when
+  submitted. It also appends the channel "`id`" (in this application we
+  use the `slug`) to the URL, creating something similar to:
+  http://vt-clone.test/channels/some-channel-slug.
+- `@method('PATCH')` uses Laravel's 'HTTP VERB' method injection to get
+  around some browsers and servers not understanding methods
+  like `PATCH`, `PUT` and so on.
+- `@csrf` injects the Laravel Cross Site Request Forgery protection
+  code.
+
+Next, immediately after the comment, replace the TEST with:
+
+```html
+    </form>
+</div>
+```
+
+We are getting there. We now need to add each of the form components.
+
+We require:
+
+- Channel Name (text)
+- Channel Owner (select)
+- Channel Slug (text)
+- Channel Public/Private (checkbox)
+- Channel Description (text area)
+- Channel Image Filename (text)
+
+To give you practice, we will show one of each input type. You will add
+the others as needed.
+
 
