@@ -13,7 +13,7 @@ using Docker in your development process.
 
 For all commands where `xxx` is shown, replace with your initials.
 
-```bash
+```shell
 curl -s https://laravel.build/xxx-yt-clone | bash 
 cd xxx-yt-clone 
 sail up
@@ -55,7 +55,7 @@ Open a second terminal so that we may initialise the Repository.
 
 Then run the following command sequence.
 
-```bash
+```shell
 git init
 git add ReadMe.md
 git commit -m "Initial commit to start repository"
@@ -71,7 +71,7 @@ git push -u origin main
 Add, or replace the contents of the attached file to the .gitignore
 file: [.gitignore](.gitignore)
 
-```bash
+```shell
 git add .gitignore
 git commit -m "Update the .gitignore to remove unwanted files"
 git push -u origin main
@@ -86,7 +86,7 @@ We are now ready to add the Jetstream UI components...
 The installation will add registration and other components for the
 user, and more ...
 
-```bash
+```shell
 sail php artisan sail:publish
 sail composer require laravel/jetstream
 sail php artisan jetstream:install livewire --teams 
@@ -112,7 +112,7 @@ and edit or customise as required.
 Now to add a couple of helpers for PhpStorm (possibly other IDEs)...
 plus a debugging bar (shown on the browser) whilst we are developing.
 
-```bash
+```shell
 sail composer require --dev barryvdh/laravel-ide-helper barryvdh/laravel-debugbar
 sail php artisan clear-compiled
 sail php artisan ide-helper:generate
@@ -139,7 +139,7 @@ between the `[`square brackets`]`.
 Do the usual sequence of adding and pushing to version control, with a
 suitable comment:
 
-```bash
+```shell
 git add .
 git commit -m "Default configuration without seed users"
 git push -u origin main
@@ -152,7 +152,7 @@ git push -u origin main
 This command also creates a migration, factory, seeder, controller and
 policy for the Channels.
 
-```bash
+```shell
 sail php artisan make:model Channel -a -r
 ```
 
@@ -173,10 +173,40 @@ Schema::create('channels', function (Blueprint $table) {
     $table->string('image')->nullable();
     $table->timestamps();
 
-    $table->foreign('user_id')->references('id')
-        ->on('users')->oncascade('delete');
 });
 ```
+
+## Relating the video to the channel:
+
+Immediately after the timestamps line, and before the closing `}` of the
+up method, we can relate the video table to it's owning channel using a
+foreign key constraint:
+
+```php
+$table->foreign('user_id')->references('id')->on('users')
+    ->onDelete('cascade')->onUpdate('cascade');
+```
+
+The above line(s) should go after the `timestamps` line, and before the
+closing `});`.
+
+What do these line(s) do?
+
+They relate the 'channels' table to the 'users' table. The relationship
+is interpreted this way:
+
+- `foreign('user_id')` is the field/column in this table that relates to
+  another table.
+- `reference('id')` is the primary key field in the second table.
+- `on('users')` is the table we are relating to.
+- `onDelete('cascade')` - tells the DBMS that when a record in the
+  related table (`users` in our case) is deleted, then all the channels
+  that use has must be deleted.
+
+We now are able to add relationships to the Model to make it easy for
+use to follow the relationship from table to table.
+
+### Defining 'fillable' fields and 'relationships'
 
 Now open the model file for the channel, `Channel.php` that is in
 the `app/Models` folder.
@@ -209,6 +239,16 @@ the `use HasFactory;` line:
     }
 ```
 
+The fillable fields are those that the application will allow to be
+altered directly by inserts, deletes and updates.
+
+The `users()` method defines how this table relates to the 'users'
+table.
+
+In this case a channel will belong to a user.
+
+### Adding a relationship to the User model
+
 Edit the `User.php` file from the same folder and add the following
 relationship definition within the class, and after the `$casts`
 definition:
@@ -224,9 +264,17 @@ definition:
     }
 ```
 
+This indicates that a user may have many channels.
+
+```text
++-------+                     +----------+
+| users | <-- 1 ------- m --> | channels |
++-------+                     +----------+
+```
+
 Now run the migration again:
 
-```bash
+```shell
 sail php artisan migrate:fresh --seed
 ```
 
@@ -271,7 +319,7 @@ Perform the usual steps:
 - commit the changes to the repository
 - push the changes to the remote repository
 
-```bash
+```shell
 git add .
 git status
 git commit -m "Base application plus Channel model and migration"
@@ -289,7 +337,7 @@ repeatedly use.
 
 Run the command:
 
-```bash
+```shell
 sail php artisan make:seeder UserSeeder
 ```
 
@@ -395,8 +443,7 @@ foreach ($seedUsers as $seedUser) {
             'name' => $channelName,
             'slug' => Str::slug($channelName, '-'),
             'public'=> $pubOrPrivate==='Public',
-            'uid' => uniqid("some-unique-prefix-with-many-characters", 
-            true),
+            'uid' => uniqid("some-unique-prefix-with-many-characters", true),
             'description' => null,
             'image' => null,
         ];
@@ -457,7 +504,7 @@ public function run()
 
 Now re-run the migration using:
 
-```bash
+```shell
 sail php artisan migrate:fresh --seed
 ```
 
@@ -467,7 +514,7 @@ sail php artisan migrate:fresh --seed
 
 Let's add the new code to version control.
 
-```bash
+```shell
 git add .
 git status
 git commit -m "Base application plus Channel model and migration"
@@ -499,7 +546,7 @@ update the required files - that is the JS and CSS files.
 If you do not have a spare CLI then open up a window, change into the
 correct folder, and run:
 
-```bash
+```shell
 npm run watch
 ```
 
@@ -781,6 +828,31 @@ Locate the file `app/Http/Requests/UpdateChannelRequest.php` and open it
 for editing.
 
 Modify the `authorize`  method to return `true` for the time being.
+
+The channel request class also has a singular location where we can
+place rules to be applied no matter if it's a create or edit call.
+
+```php
+    public function rules()
+    {
+        return [
+            "name" => ['required', 'min:4'],
+            'slug' => ['required', 'min:4', 'unique:channels,slug,'.$this->channel->id],
+            'public' => ['nullable', 'boolean',],
+            'description' => ['nullable', 'max:4096'],
+        ];
+    }
+```
+
+The `rules` method shown above does the following:
+
+- ensures that the name is given, and it is at least 4 characters long.
+- ensures that the slug is given, is at least 4 characters, and that it
+  is unique across all channels.
+- tells us that the private may be empty, but if a value is submitted
+  then it is true or false.
+- description is allowed to be empty but if it is entered then it has a
+  maximum length of 4096 characters.
 
 ### Channel Policy
 
@@ -1210,7 +1282,183 @@ public function store(StoreChannelRequest $request)
 }
 ```
 
+# 6. Videos
 
+Our next step, creating the videos interactions.
 
+We will need to:
 
+- Create video model, migration, seeder, controller etc.
+- Create BREAD UI
+- Create BREAD actions in the controller
+
+## Creating the model, migration etc
+
+Run the same command as we did before, but this time the model's name
+is `Video`.
+
+```shell
+sail php artisan make:model Video -a -r
+```
+
+## Create the migration
+
+Locate the `database/migrations`
+folder and then open the file that will have `create_videos_table`
+in its name.
+
+In this example, it was called:
+
+- `2022_01_09_074102_create_videos_table.php`
+
+We will add the following fields to the table:
+
+- title (string)
+- description (text, max 1024, empty allowed)
+- duration (time, empty allowed)
+- series (small integer, unsigned, empty allowed)
+- episode (small integer, unsigned, empty allowed)
+- channel id (big integer, unsigned, default of 0)
+- video filename (string, empty allowed)
+
+This will be a good start point.
+
+The migration "up" code will have the following definitions for the
+above columns:
+
+```php
+$table->id();
+$table->string('title')->required()->default('ERROR: No Title Given');
+$table->text('description')->nullable();
+$table->time('duration')->nullable();
+$table->unsignedSmallInteger('series')->nullable();
+$table->unsignedSmallInteger('episode')->nullable();
+$table->unsignedBigInteger('channel_id')->default(0);
+$table->string('filename')->nullable();
+$table->timestamps();
+```
+
+### Updating tables when you need to alter the structure
+
+It is important to remember that we do not always need to re-run a
+migration with the keyword 'fresh', and in fact there are many
+situations where that is a dangerous command option to use.
+
+We usually only do a 'fresh' when we are able to restart the database
+from scratch as `migrate:fresh` literally dumps all the tables in the
+database, and then starts the migration from the beginning. **Thus
+deleting ALL data**.
+
+Even more important is that as you develop, you may determine that
+tables need to be altered. In this situation, we simply create another
+migration an in the 'up' we alter the table as needed.
+
+So what we are going to do is demonstrate the ability to alter a table
+using our new videos table.
+
+To do this we use the following command to create a new migration:
+
+```shell
+sail php artisan make:migration add_thumbnail_and_foreign_key_to_videos_table --table=videos
+```
+
+*Notice the meaningful name for the migration.*
+
+Next, locate the newly created file and edit it. The `up` method will
+read:
+
+```php
+Schema::table('videos', function (Blueprint $table) {
+    $table->string('filename')->nullable()->after('uid');
+    $table->foreign('channel_id')
+        ->references('id')->on('channels');
+});
+```
+
+In the `down` method we need to make sure we only drop the new column,
+and the relationship:
+
+```php
+Schema::table('videos', function (Blueprint $table) {
+    $table->dropColumn('filename');
+    $table->dropForeign('channel_id');
+});
+```
+
+Running this migration is as simple as:
+
+```shell
+sail php artisan migrate
+```
+
+To reverse the migration you use:
+
+```shell
+sail php artisan migrate:rollback
+```
+
+**DO NOT** reverse the migration as we may start using this soon.
+
+## Seeding the video table
+
+We are only going to add three seed videos at this time. If you were
+adding hundreds of seeding videos then the addition of a progress bar
+could be useful. The code below has such a progress bar that will
+display on the CLI when you seed the database.
+
+```php
+public function run()
+    {
+        $seedVideos = [
+            [
+                'title' => "Welcome",
+                'description' => "Front titles video",
+                'duration' => "00:00:07",
+                'series' => null,
+                'episode' => null,
+                'channel_id' => 1,
+                'filename' => "",
+            ],
+            [
+                'title' => "Goodbye",
+                'description' => "End titles video",
+                'duration' => "00:00:12",
+                'series' => null,
+                'episode' => null,
+                'channel_id' => 2,
+                'filename' => "",
+            ],
+            [
+                'title' => "Nothingness",
+                'description' => "A dark screen",
+                'duration' => "01:01:01",
+                'series' => 1,
+                'episode' => 1,
+                'channel_id' => 4,
+                'filename' => "",
+            ],
+        ];
+
+        $totalSeedRecords = count($seedVideos);
+        // Create a progress bar to monitor seeding of videos
+        $progressBar = $this->command->getOutput()->createProgressBar($totalSeedRecords);
+        $progressBar->setRedrawFrequency(20);
+        $progressBar->maxSecondsBetweenRedraws(0.05);
+        $progressBar->minSecondsBetweenRedraws(0.01);
+        $progressBar->start();
+
+        foreach($seedVideos as $seedVideo){
+            Video::create($seedVideo);
+            $progressBar->advance();
+        }
+
+        // end the progress bar, and start a new console output line
+        $progressBar->finish();
+        $this->command->info('');
+    }
+```
+
+## Create Video UI
+
+We are now ready to create the UI for the Videos.
 
