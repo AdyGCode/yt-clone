@@ -9,7 +9,7 @@ using Docker in your development process.
 
 ---
 
-# Create new app
+# 1. Create new app
 
 For all commands where `xxx` is shown, replace with your initials.
 
@@ -21,7 +21,7 @@ sail up
 
 ---
 
-# Initialise Version Control
+## Initialise Version Control
 
 We do this in two steps:
 
@@ -29,7 +29,7 @@ We do this in two steps:
 2. Initialise the local repository, add and commit the ReadMe (this
    file), set the origin and then push to the remote we created.
 
-## Create Remote Repository
+### Create Remote Repository
 
 Open the [GitHub website](http://github.com) and log into your account.
 
@@ -64,9 +64,9 @@ git remote add origin URL_TO_YOUR_EMPTY_REMOTE_REPO
 git push -u origin main
 ```
 
-![Initialising the repository](docs/images/ReadMe.png)
+![Initialising the repository](docs/images/Gitting-ready-for-version-control.png)
 
-## Updating and Committing the .gitignore
+### Updating and Committing the .gitignore
 
 Add, or replace the contents of the attached file to the .gitignore
 file: [.gitignore](.gitignore)
@@ -79,12 +79,12 @@ git push -u origin main
 
 ---
 
-# Add UI Skeleton Code
+# 2. Add UI Skeleton Code
 
 We are now ready to add the Jetstream UI components...
 
 The installation will add registration and other components for the
-user, plus...
+user, and more ...
 
 ```bash
 sail php artisan sail:publish
@@ -100,9 +100,12 @@ sail php artisan vendor:publish --tag=livewire:assets --tag=livewire:config
 sail php artisan vendor:publish --tag=livewire:pagination --tag=sanctum-config
 ```
 
-These commands add Laravel Livewire, and then publish the components and
-some configuration files so that you can directly access and edit or
-customise as required.
+These commands also add Laravel Livewire, and then publish the
+components and some configuration files so that you can directly access
+and edit or customise as required.
+
+> **Note:** The use of Jetstream does not mean we cannot use blade
+> templates, so we are good to go.
 
 ## IDE Helpers
 
@@ -144,7 +147,7 @@ git push -u origin main
 
 ---
 
-# Create Model for Channel
+# 3. Create Model for Channel
 
 This command also creates a migration, factory, seeder, controller and
 policy for the Channels.
@@ -227,9 +230,10 @@ Now run the migration again:
 sail php artisan migrate:fresh --seed
 ```
 
+## Using the Channel's 'slug'
+
 When a user registers, we want the application to automatically create
-them a channel based around the user's name and add 'channel' to the
-end.
+them a channel based around the user's name.
 
 The channel name will be similar to this: `Eileen Dover Public Channel`.
 
@@ -276,7 +280,7 @@ git push origin main
 
 ---
 
-# Add Seeder Data
+# 4. Add Seeder Data
 
 To enable interactive testing, we will add some seed data that we can
 repeatedly use.
@@ -301,7 +305,7 @@ In the run method we are going to do two things:
 
 ### Include Required Classes
 
-Before we add the users, we will add the required `uses` statements:
+Before we add the users, we will add the required `use` statements:
 
 ```php
 use App\Models\Channel;
@@ -334,12 +338,18 @@ The seed users are:
 | Administrator | admin@example.com  | Password1 |
 | Eileen Dover  | eileen@example.com | Password1 |
 | Russel Leaves | russel@example.com | Password1 |
+| YOUR NAME     | GIVEN@example.com  | Password1 |
 |---------------|--------------------|-----------|
 ```
 
-These are added to an array containing an associative array for each
-user. The PHP to do this is shown below, and you should add it to the
-run method:
+Replace `YOUR NAME` with your own name, so you have your own entry
+point, and `GIVEN` is your given (*first*) name.
+
+These names are added to an array containing associative arrays for each
+user.
+
+The PHP to do this is shown below, and you should add it to the run
+method:
 
 ```php
 $seedUsers = [
@@ -358,13 +368,21 @@ $seedUsers = [
             'email'=>'russel@example.com',
             'password'=>Hash::make('Password1'),
         ],
+        [
+            'name'=>'YOUR NAME',
+            'email'=>'GIVEN@example.com',
+            'password'=>Hash::make('Password1'),
+        ],
     ];
 ```
 
 ### Seeding Loop
 
 Next we will create the loop that adds each new user, plus creates the
-channel:
+channel. The code goes immediately after the seed names and before the
+closing curly bracket `}` of the run method.
+
+Here is sample code for you:
 
 ```php
 foreach ($seedUsers as $seedUser) {
@@ -393,17 +411,14 @@ After the seeding loop and just before the closing `}` curly bracket of
 the class we will add the following code, which creates a new personal
 team for the user.
 
-> We may or may not use teams later in the project.
+> We may or may not use teams later in the project. They could be
+> seen as "groups of friends" or "colleagues" or "sections of a
+> company" or similar.
+
+The `createTeam` method is given below and is taken from the Laravel
+Jetstream code that is generated when the 'module' is installed:
 
 ```php
-/**
- * Create a personal team for the user.
- *
- * Taken from the CreateNewUser class and reproduced for simplicity.
- *
- * @param  \App\Models\User  $user
- * @return void
- */
 protected function createTeam(User $user)
 {
     $user->ownedTeams()->save(
@@ -461,12 +476,13 @@ git push origin main
 
 ---
 
-# Channel UI
+# 5. Channel UI
 
 For the channel UI we need to:
 
 1. Create the required routing.
-2. Create views and controller methods for Add, Edit, Browse and Read.
+2. Create views and controller methods for BREAD operations (Browse,
+   Read, Edit, Add and Delete).
 3. Add remaining methods to Store, Update and Destroy channels.
 
 When we used the `php artisan make:model` command we listed `-a` and
@@ -474,9 +490,11 @@ When we used the `php artisan make:model` command we listed `-a` and
 for us, and all we will need to do is now add the required code to
 perform the actions.
 
-Because TailwindCSS version 3 now uses a different way of working we
-will need to run a command in the CLI to watch the project and
-automatically update the required files - that is the JS and CSS files.
+Because TailwindCSS version 3 now uses a different way of working, it
+adds the required classes [Just In Time](https://tailwindcss.
+com/blog/just-in-time-the-next-generation-of-tailwind-css), we will need
+to run a command in the CLI to watch the project and automatically
+update the required files - that is the JS and CSS files.
 
 If you do not have a spare CLI then open up a window, change into the
 correct folder, and run:
@@ -487,20 +505,21 @@ npm run watch
 
 Leave this running whilst you are working.
 
-![](docs/images/mix-watching-for-updates-01.png)
+![](docs/images/Mix-watching-for-updates-01.png)
 
 When a change is detected it will 'compile' the code, and generate new
 files. Success is shown below:
 
-![](docs/images/mix-watching-for-updates-02.png)
+![](docs/images/Mix-watching-for-updates-02.png)
 
 ## Adding Routes for Channels
 
 Open the `web.php` file from the `routes` folder.
 
-Modify it by grouping the "authenticated" routes by adding and modifying
-the following route. In this you will note that we move the dashboard
-route into the group, and update it to remove the middleware call.
+Modify it by grouping the "authenticated" routes. We do this by adding
+and modifying the following route. In this you will note that we move
+the dashboard route into the group, and update it to remove the
+middleware call.
 
 ```php
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
@@ -519,14 +538,20 @@ possible actions.
 > **ASIDE:** When adding routes, it is a good idea to keep them in
 > alphabetical order as it makes it easier to locate them. Also,
 > group your authenticated and other types of route together as well.
-> Any actions likes this will help you to improve productivity.
+>
+> Performing these forms of actions will help you to improve
+> productivity.
 
-## View Location
+## View File Location
 
 Views are contained in the `resources/views` folder.
 
-We place the views for model that requires them, into a folder in this
-location.
+We place the views for any model that requires them, into a folder in
+this location.
+
+Normally the folder is named the same as the pluralised version of the
+model name. For example *Channel* becomes
+*channels*, and *Sheep* would become *sheep*.
 
 ## Channels Views and Controller Methods
 
@@ -574,8 +599,8 @@ for display.
 ### Channels Views: Index
 
 To provide us with the first part of our layout, we will create an index
-page for the channels, but we will make it display all channels, both
-public and private.
+page for the channels, but we will make it display **all** channels,
+both public, private and those owned by other users.
 
 At a later time we will make it show just the public channels and the
 private channels owned by the user.
@@ -606,7 +631,9 @@ look similar to the current layout.
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
-                <h3 class="text-2xl text-bold text-stone-700 pb-4">INDEX: Do NOTHING Yet</h3>
+                <h3 class="text-2xl text-bold text-stone-700 pb-4">
+                INDEX: Does NOTHING Yet
+                </h3>
 
             </div>
         </div>
@@ -618,15 +645,19 @@ The `x-app-layout` tells Laravel to use the `layouts/app.blade.php`
 template file as the base for this page, and then insert content as
 needed.
 
+The `<x-slot name="header">` tells the templating engine to look for a
+named location (called 'header') in the main template file and insert
+the content inside the "element" at the required location.
+
 ### Checking Page Renders
 
 Open the browser, open the site (http://localhost for sail users), and
-then log-in using the administrator user.
+then log-in using the administrator (or your own) user.
 
 Next, once the user is logged in, edit the URL to be
 `http://localhost/channels/` and you should see:
 
-![Testing the channels home page](docs/images/channels-index-1.png)
+![Testing the channels home page](docs/images/Channels-index-1.png)
 
 ### Actually Displaying the Channels
 
@@ -666,15 +697,21 @@ by adding the `foreach` that will process each channel in turn:
 You should get a list of the channels shown a little cards. It will
 appear slightly different to shown here:
 
-![](docs/images/channels-index-list.png)
+![](docs/images/Channels-index-list.png)
 
 We will modify the edit and details buttons later.
+
+### Commit!
+
+This would be a good point to add, commit and push your code.
 
 ## Edit
 
 As with the index, we need to add the required code to the Channel
 Controller, and create a View. We also need to update the Update Channel
 Request and Channel Policy settings.
+
+### ChannelController update and edit methods
 
 The Channel Controller will have two methods updated/created:
 
@@ -704,9 +741,19 @@ This method will open the channels/edit view
 (`resources/views/channels/edit.blade.php`) sending a list of the users
 and the channel details to the view for display, and the user to edit.
 
+Note that we only ask Laravel to give us the User's name and id:
+
+```php
+$users = User::all(['id','name']);
+```
+
 ### Update Method
 
 Now we can write the code for the update.
+
+This method accepts the request made by the user and the channel it is
+working on, it then updates the channel as needed. Lastly it redirects
+to the channel index (home) page.
 
 ```php
 public function update(UpdateChannelRequest $request, Channel $channel)
@@ -761,11 +808,11 @@ response is sent with an error message.
 
 Here is the form (we will build this in a moment):
 
-![The Edit Channel Form](docs/images/Editing-Channel-Form-01.png)
+![The Edit Channel Form](docs/images/Channel-edit-form-before-submit.png)
 
 And when Eileen tried to make changes, we get:
 
-![Channel Editing Denied](docs/images/Edit-Channel-Denied.png)
+![Channel Editing Denied](docs/images/Edit-channel-denied.png)
 
 ### Channel Edit Page
 
@@ -784,7 +831,7 @@ blade file in the Resources/views/channels folder by:
 
 Start by adding the following code:
 
-```html
+```php
 
 <x-app-layout>
   <x-slot name="header">
@@ -816,7 +863,7 @@ Let's add the 'heading' for the main content area.
 
 Just above the `<-- Main ... -->` comment, add the following:
 
-```html
+```php
 
 <div class="p-4 bg-stone-700">
   <h3 class="text-2xl text-bold text-stone-200">
@@ -830,7 +877,7 @@ This will create a header at the top of the 'page card'.
 Next, add the form wrapping code, just after the previous code, and
 before the comment.
 
-```html
+```php
 
 <div class="container mx-auto p-4 pt-6 gap-4">
 
@@ -852,7 +899,7 @@ before the comment.
 
 Next, immediately after the comment, replace the TEST with:
 
-```html
+```php
     </form>
 </div>
 ```
@@ -875,10 +922,10 @@ the others as needed.
 
 #### Text field (Channel Name)
 
-Immediately before the `<!--` comment `-->`, and after the `@csrf`, we
-will now add the Channel Name 'component'.
+Immediately before the `<!-- Main page... comment -->`, and after the
+`@csrf`, we will now add the Channel Name 'component'.
 
-```html
+```php
 
 <div class="container mx-auto px-4 py-1 mt-6 flex flex-row">
   <label for="name" class="flex-none basis-1/4">Name</label>
@@ -905,7 +952,7 @@ will now add the Channel Name 'component'.
   control border red, and second to display an error message.
 
 Add a blank line or two to the code (for readability), and then we can
-add the Owner selection.
+add the Owner selection using a `<select..>` box.
 
 #### Select box field (Channel Owner)
 
@@ -917,13 +964,13 @@ The fun part is creating the list of users, and selecting the current
 owner automatically. The code does the following:
 
 - take a list of users (the id and name only)
-- use a blade @foreach macro to loop through each user
-- create an option for the select box, containing:
-  - the value of the user's id,
-  - the text of the user's name, and
+- use a blade `@foreach` macro to loop through each user
+- create an `<option>` for the select box, containing:
+  - the value of the user's `id`,
+  - the text of the user's `name`, and
   - if the user is the current owner, we set it to selected
 
-```html
+```php
 <!-- Channel Owner -->
 <div class="container mx-auto px-4 py-1 flex flex-row">
   <label for="user_id" class="flex-none basis-1/4">Owner</label>
@@ -931,8 +978,7 @@ owner automatically. The code does the following:
           class="flex-1 basis-3/4 @error('user_id') border-red-500 @enderror ">
     @foreach($users as $user)
     <option value="{{$user->id}}"
-            @if( $user->id === (old('user_id')?? auth()->user()->id)
-      ) selected
+            @if( $user->id === (old('user_id')?? auth()->user()->id) ) selected
       @endif >
       {{$user->name}}
     </option>
@@ -957,7 +1003,7 @@ Next we can look at the Toggle button...
 This is achieved by doing a bit of work in the form, but we use CSS to
 tweak it. More on the CSS tweak at the end of this section.
 
-```html
+```php
 <!-- Channel Public/Private -->
 <div class="container mx-auto px-4 py-1 flex flex-row">
   <label for="public" class="flex-none basis-1/4">Public</label>
@@ -989,7 +1035,7 @@ tweak it. More on the CSS tweak at the end of this section.
 We are almost there. The other input type is the text area, so let's hit
 the description field.
 
-```html
+```php
 <!-- Channel Description -->
 <div class="container mx-auto my-1 px-4 py-1 flex flex-row border border-0 border-b-1 border-stone-200">
   <label for="description"
@@ -1016,7 +1062,7 @@ the whitespace will stop the content being shown correctly.
 
 The last section is the buttons,and here is the code to create them:
 
-```html
+```php
 <!-- Submission Buttons -->
 <div class="container mx-auto px-4 py-1 my-6 mb-4 flex flex-row gap-4">
   <span class="basis-1/4 flex-none"></span>
@@ -1118,7 +1164,7 @@ method.
 The open form code will not need the channel to be passed, nor will it
 need a `@method` override:
 
-```html
+```php
 
 <form action="{{route('channels.store')}}" method="post">
   @csrf
@@ -1127,14 +1173,14 @@ need a `@method` override:
 The `value="..."` on the controls will not need to refer to channel. For
 example, we only need to use the `old` function:
 
-```html
+```php
     value="{{ old('name') }}"
 ```
 
 The `option` in the select controle, will use the currently logged in
 user by default:
 
-```html
+```php
 
 <option value="{{$user->id}}"
         @if( $user->id === (old('user_id')?? auth()->user()->id) )
