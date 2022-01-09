@@ -167,7 +167,7 @@ Schema::create('channels', function (Blueprint $table) {
     $table->unsignedBigInteger('user_id');
     $table->string('name');
     $table->string('slug');
-    $table->boolean('private')->default(false);
+    $table->boolean('public')->default(false);
     $table->string('uid');
     $table->text('description')->nullable();
     $table->string('image')->nullable();
@@ -654,7 +654,7 @@ private channels owned by the user.
 
 Create a new folder inside `resources/views` called `channels`.
 
-Then create aa file called `index.blade.php` inside the
+Then create a file called `index.blade.php` inside the
 `resources/views/channels` folder.
 
 > **SHORTCUT :** We can create the folder and the file in one step
