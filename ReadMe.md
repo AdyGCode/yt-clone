@@ -678,9 +678,11 @@ look similar to the current layout.
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
 
-                <h3 class="text-2xl text-bold text-stone-700 pb-4">
-                INDEX: Does NOTHING Yet
-                </h3>
+                <div class="p-4 bg-stone-700">
+                    <h3 class="text-2xl text-bold text-stone-200">
+                        All Channels
+                    </h3>
+                </div>
 
             </div>
         </div>
