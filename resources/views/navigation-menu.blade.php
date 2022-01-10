@@ -17,7 +17,7 @@
                     </x-jet-nav-link>
 
 
-                    <x-jet-nav-link href="{{ route('videos') }}" :active="request()->routeIs('videos.*')">
+                    <x-jet-nav-link href="{{ route('videos.index') }}" :active="request()->routeIs('videos.*')">
                         {{ __('Videos') }}
                     </x-jet-nav-link>
 

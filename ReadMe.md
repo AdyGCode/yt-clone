@@ -134,6 +134,32 @@ between the `[`square brackets`]`.
 ],
 ```
 
+### Adding TailwindCSS Helpers
+
+We will add a couple more items to our application. These are
+TailwindCSS helpers that may or may not be used, but as Tailwind will
+not add them to the CSS unless required, we can list them now.
+
+In the CLI run the following:
+
+```shell
+npm install @tailwindcss/aspect-ratio @tailwindcss/line-clamp
+npm install @tailwindcss/typography @tailwindcss/forms
+```
+
+Now in the `tailwind.config.css` file edit the plugins section to read:
+
+```javascript
+plugins: [
+  require('@tailwindcss/forms'),
+  require('@tailwindcss/typography'),
+  require('@tailwindcss/line-clamp'),
+  require('@tailwindcss/aspect-ratio')
+],
+```
+
+The comma is needed :)
+
 ### Do a Commit and Push to Version Control
 
 Do the usual sequence of adding and pushing to version control, with a
@@ -1532,7 +1558,7 @@ public function index()
 Before we do the actions, let's update the navigation to point at the
 correct route.
 
-Open the navigation-menu.blade.php file and edit the route for the
+Open the `navigation-menu.blade.php` file and edit the route for the
 videos from being:
 
 ```php
@@ -1546,7 +1572,7 @@ videos from being:
 to become:
 
 ```php
-<x-jet-nav-link href="{{ route('videos') }}" 
+<x-jet-nav-link href="{{ route('videos.index') }}" 
                 :active="request()->routeIs('videos.*')">
                         {{ __('Videos') }}
 </x-jet-nav-link>
@@ -1594,6 +1620,103 @@ index page, but we start with the same basic framework for the page:
         </div>
     </div>
 </x-app-layout>
+```
+
+We now need to lay out the videos in a way that makes it easy to view.
+In this case the channel layout is not really appropriate, we need more
+of a 'list' of the videos.
+
+We are going to replace the `VIDEO LIST HERE` text with the following:
+
+```php
+@foreach($videos as $video)
+
+    <div class="flex items-center justify-between w-full border border-stone-400 rounded">
+        <div class="flex flex-col lg:flex-row w-full items-start lg:items-center rounded bg-white shadow">
+
+        VIDEO DETAILS HERE
+
+        </div>
+    </div>
+
+@endforeach
+```
+
+The above will generate the list, just as it did for the Channels.
+
+Each video will have its own "card" which we will be splitting into
+parts. Left will have an image of the video, right will show edit and
+details buttons, the middle the details. On extra-small screens these
+will occupy full width for each part.
+
+### Wide card for Video
+
+![Wide card for Video](docs/images/Video-card-wide.png)
+
+### Narrow card for Video
+
+![Narrow card for Video](docs/images/Video-card-narrow.png.png)
+
+### Adding the Card Code
+
+Inside the card outline, re replace `VIDEO DETAILS HERE` with the
+following parts:
+
+#### Video thumbnail
+
+```php
+<img src="{{ asset('images/'.($video->image ?? "video.png")) }}"
+     class="w-full lg:w-1/5  rounded-l bg-gray-100 dark:bg-gray-700"
+     alt="cover image for {{$video->name}}"
+/>
+```
+
+#### Video details
+
+```php
+<div class="w-full lg:w-3/5 dark:bg-gray-800 px-4 py-2">
+    <p tabindex="0"
+       class="focus:outline-none text-base text-stone-800 dark:text-stone-50 text-xl">
+        {{$video->title}}
+    </p>
+    <p tabindex="0"
+       class="focus:outline-none text-base leading-5 text-stone-800 dark:text-stone-50
+       line-clamp-3 xs:line-clamp-2">
+        {{$video->description}}
+    </p>
+    <p tabindex="0"
+       class="focus:outline-none text-base leading-5 text-stone-800 dark:text-stone-50 text-xs
+       xs:text-sm">
+        Length: {{$video->duration}}
+    </p>
+</div>
+```
+
+#### Video action buttons
+
+```php
+<div class="w-full lg:w-1/5 dark:bg-gray-800 px-4 py-2">
+    <div class="flex items-center pt-4">
+        <a href="{{route('videos.show', ['video'=>$video])}}"
+           class="rounded p-1 px-4 mr-4 border border-1
+          border-blue-500 bg-blue-50 text-blue-900
+          hover:border-blue-900 hover:bg-blue-500 hover:text-blue-50
+          animation ease-in-out duration-300"
+           role="button">
+            Details
+        </a>
+        @auth()
+            <a href="{{route('videos.edit', ['video'=>$video])}}"
+               class="rounded p-1 px-4 border border-1
+              border-stone-300 bg-stone-50 text-stone-500
+              hover:border-stone-900 hover:bg-stone-500 hover:text-stone-50
+              animation ease-in-out duration-300"
+               role="button">
+                Edit
+            </a>
+        @endauth
+    </div>
+</div>
 ```
 
 
