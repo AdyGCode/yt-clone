@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class VideoPolicy
 {
@@ -18,7 +19,7 @@ class VideoPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return Response::allow();
     }
 
     /**
@@ -30,7 +31,7 @@ class VideoPolicy
      */
     public function view(User $user, Video $video)
     {
-        //
+        return Response::deny();
     }
 
     /**
@@ -41,7 +42,7 @@ class VideoPolicy
      */
     public function create(User $user)
     {
-        //
+        return Response::deny();
     }
 
     /**
@@ -53,7 +54,7 @@ class VideoPolicy
      */
     public function update(User $user, Video $video)
     {
-        //
+        return Response::deny();
     }
 
     /**
@@ -65,7 +66,7 @@ class VideoPolicy
      */
     public function delete(User $user, Video $video)
     {
-        //
+        return Response::deny();
     }
 
     /**
@@ -77,7 +78,7 @@ class VideoPolicy
      */
     public function restore(User $user, Video $video)
     {
-        //
+        return Response::deny();
     }
 
     /**
@@ -89,6 +90,6 @@ class VideoPolicy
      */
     public function forceDelete(User $user, Video $video)
     {
-        //
+        return Response::deny();
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\VideoController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,4 +26,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     Route::resource('channels', ChannelController::class);
     Route::get('channels/{channel}/delete', [ChannelController::class, "delete"])->name('channels.delete');
+
+    Route::resource('videos', VideoController::class);
+    Route::get('videos/{video}/delete', [VideoController::class, "delete"])->name('videos.delete');
 });

@@ -8,6 +8,16 @@ use App\Models\Video;
 
 class VideoController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->authorizeResource(Video::class);
+
+        // Post::class is the model to lookup the policy
+        // post - parameter name, explained w/ can middleware
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +25,8 @@ class VideoController extends Controller
      */
     public function index()
     {
-        //
+        $videos = Video::all();
+        return view('videos.index', compact(['videos']));
     }
 
     /**
@@ -69,6 +80,18 @@ class VideoController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(UpdateVideoRequest $request, Video $video)
+    {
+        //
+    }
+
+
+    /**
+     * Verify resource deletion
+     *
+     * @param  Video  $video
+     * @return \Illuminate\Http\Response
+     */
+    public function delete(Video $video)
     {
         //
     }

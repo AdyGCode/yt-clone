@@ -1381,7 +1381,6 @@ and the relationship:
 ```php
 Schema::table('videos', function (Blueprint $table) {
     $table->dropColumn('filename');
-    $table->dropForeign('channel_id');
 });
 ```
 
@@ -1461,4 +1460,140 @@ public function run()
 ## Create Video UI
 
 We are now ready to create the UI for the Videos.
+
+We will create:
+
+- Routing for Videos
+- Store and Update requests for Videos
+- Video Policies
+- Pages for videos
+  - Browse (Index)
+  - Read (Show)
+  - Edit (Edit, Update)
+  - Add (Create, Store)
+  - Delete (Delete, Destroy) - we will tackle the delete at a later
+    point.
+
+### Routing for Videos
+
+Open the `wep.php` file and create the same type of route as we did for
+Channels:
+
+```php
+    Route::resource('videos', VideoController::class);
+    Route::get('videos/{video}/delete', [VideoController::class, "delete"])->name('videos.delete');
+```
+
+### Add extra Delete method to VideoController class
+
+We will add a stub for the `delete` method by editing the
+VideoController class:
+
+```php
+/**
+ * Verify resource deletion
+ * 
+ * @param  Video  $video
+ * @return \Illuminate\Http\Response
+ */
+public function delete(Video $video)
+{
+    //
+}
+```
+
+> **REMEMBER :** All methods and variables and so on, are defined
+> WITHIN the class' opening `{` and closing `}`.
+
+### Update the required Policies
+
+Ensure that each of the VideoPolicy methods
+either `return Response::allow();
+` or `return Response::allow();` rather than being blank.
+
+It is encouraged to return false until you implement the
+required/corresponding functionality in the controller.
+
+### Add the Video Controller index method code
+
+The index method is the same as channels except it will relate to
+videos :)
+
+```php
+public function index()
+{
+    $videos = Video::all();
+    return view('videos.index', compact(['videos']));
+}
+```
+
+### Update Navigation
+
+Before we do the actions, let's update the navigation to point at the
+correct route.
+
+Open the navigation-menu.blade.php file and edit the route for the
+videos from being:
+
+```php
+<x-jet-nav-link href="{{ route('dashboard') }}" 
+                :active="request()->routeIs('videos.*')">
+                        {{ __('Videos') }}
+</x-jet-nav-link>
+
+```
+
+to become:
+
+```php
+<x-jet-nav-link href="{{ route('videos') }}" 
+                :active="request()->routeIs('videos.*')">
+                        {{ __('Videos') }}
+</x-jet-nav-link>
+```
+
+Now let's put the index blade file together.
+
+### Browse (index.blade.php)
+
+Let's create the file and folder for the index of the videos.
+
+To do so, we click on the views folder (`resources/views`), then File
+--> New --> PHP File. Next type in `videos/index.blade.php` and press
+enter.
+
+You should have a new file created as shown here:
+![](docs/images/Creating-videos-index-blade-file.png)
+
+The code for this page will be slightly different from the Channels
+index page, but we start with the same basic framework for the page:
+
+```php
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Videos') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg ">
+
+                <div class="p-4 bg-stone-700">
+                    <h3 class="text-2xl text-bold text-stone-200">
+                        All Videos
+                    </h3>
+                </div>
+
+                <div class="container mx-auto grid grid-cols-1 p-4 pt-6 gap-4">
+                    VIDEO LIST HERE
+                </div>
+
+            </div>
+        </div>
+    </div>
+</x-app-layout>
+```
+
 
