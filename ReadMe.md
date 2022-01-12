@@ -7,6 +7,10 @@ development was completed using a Docker based dev environment that is
 part of the Laravel installation. This may be omitted if you are not
 using Docker in your development process.
 
+The styling of the application is not great, and has some
+inconsistencies as ideas are tried out. This though, may be fixed and
+made consistent and better at a later point.
+
 ---
 
 # 1. Create new app
@@ -47,28 +51,33 @@ as needed.
 
 ### Terminal time
 
-Open a second terminal so that we may initialise the Repository.
+> We usually need two or three terminals when developing, so if you
+> have one open, open a new one and make sure you are in your
+> xxx-yt-clone folder before continuing.
+>
+>  ![Image of three terminal sessions running at the same time](docs/images/CLI-three-terminal-sessions.png.png)
+> This shows three sessions: bottom - docker monitor, npm monitoring,
+> and at the top the CLI being used for sail commands.
 
-> We usually need TWO terminals when developing, so if you have one
-> open, open a new one and make sure you are in your xxx-yt-clone folder
-> before continuing.
+Open a second terminal so that we may initialise the repository.
 
-Then run the following command sequence.
+Then run the following command sequence, replacing the
+`URL_TO_EMPTY_REMOTE` with the correct `http://...` address.
 
 ```shell
 git init
 git add ReadMe.md
 git commit -m "Initial commit to start repository"
 git branch -M main
-git remote add origin URL_TO_YOUR_EMPTY_REMOTE_REPO
+git remote add origin URL_TO_EMPTY_REMOTE
 git push -u origin main
 ```
 
 ![Initialising the repository](docs/images/Gitting-ready-for-version-control.png)
 
-### Updating and Committing the .gitignore
+### Updating and Committing the `.gitignore`
 
-Add, or replace the contents of the attached file to the .gitignore
+Add, or replace the contents of the attached file to your `.gitignore`
 file: [.gitignore](.gitignore)
 
 ```shell
@@ -134,7 +143,7 @@ between the `[`square brackets`]`.
 ],
 ```
 
-### Adding TailwindCSS Helpers
+## Adding TailwindCSS Helpers
 
 We will add a couple more items to our application. These are
 TailwindCSS helpers that may or may not be used, but as Tailwind will
@@ -147,7 +156,8 @@ npm install @tailwindcss/aspect-ratio @tailwindcss/line-clamp
 npm install @tailwindcss/typography @tailwindcss/forms
 ```
 
-Now in the `tailwind.config.css` file edit the plugins section to read:
+Now in the `tailwind.config.css` file edit the `plugins` section to
+read:
 
 ```javascript
 plugins: [
@@ -158,7 +168,8 @@ plugins: [
 ],
 ```
 
-The comma is needed :)
+The comma after the `]` is needed as there are lines of code after the
+updated lines
 
 ### Do a Commit and Push to Version Control
 
@@ -202,11 +213,11 @@ Schema::create('channels', function (Blueprint $table) {
 });
 ```
 
-## Relating the video to the channel:
+## Relating the user to the channel:
 
-Immediately after the timestamps line, and before the closing `}` of the
-up method, we can relate the video table to it's owning channel using a
-foreign key constraint:
+Immediately after the timestamps line, and before the closing `});`
+of the up method, we can relate the video table to it's owning channel
+using a foreign key constraint:
 
 ```php
 $table->foreign('user_id')->references('id')->on('users')
@@ -216,10 +227,8 @@ $table->foreign('user_id')->references('id')->on('users')
 The above line(s) should go after the `timestamps` line, and before the
 closing `});`.
 
-What do these line(s) do?
-
-They relate the 'channels' table to the 'users' table. The relationship
-is interpreted this way:
+What do these line(s) do? They relate the 'channels' table to the '
+users' table. The relationship is interpreted this way:
 
 - `foreign('user_id')` is the field/column in this table that relates to
   another table.
@@ -227,7 +236,7 @@ is interpreted this way:
 - `on('users')` is the table we are relating to.
 - `onDelete('cascade')` - tells the DBMS that when a record in the
   related table (`users` in our case) is deleted, then all the channels
-  that use has must be deleted.
+  that user has must be deleted.
 
 We now are able to add relationships to the Model to make it easy for
 use to follow the relationship from table to table.
@@ -323,7 +332,8 @@ model and add the following before the `public function user` line:
 
 ```php
     /**
-     * Provides the key name for the routes to be the slug in place of the commonly used 'id'.
+     * Provides the key name for the routes to be the slug in 
+     * place of the commonly used 'id'.
      *
      * @return string
      */
@@ -536,7 +546,7 @@ sail php artisan migrate:fresh --seed
 
 ![Seeding the users and creating their channels and teams at the same time](docs/images/Seeding-users-channels-teams.png)
 
-### Add, Commit, Push
+## Add, Commit, Push
 
 Let's add the new code to version control.
 
@@ -564,12 +574,12 @@ for us, and all we will need to do is now add the required code to
 perform the actions.
 
 Because TailwindCSS version 3 now uses a different way of working, it
-adds the required classes [Just In Time](https://tailwindcss.
-com/blog/just-in-time-the-next-generation-of-tailwind-css), we will need
-to run a command in the CLI to watch the project and automatically
-update the required files - that is the JS and CSS files.
+adds the required classes
+[Just In Time](https://tailwindcss.com/blog/just-in-time-the-next-generation-of-tailwind-css)
+, we will need to run a command in the CLI to watch the project and
+automatically update the required files - that is the JS and CSS files.
 
-If you do not have a spare CLI then open up a window, change into the
+If you do not have a spare CLI then, open up a window, change into the
 correct folder, and run:
 
 ```shell
@@ -578,12 +588,15 @@ npm run watch
 
 Leave this running whilst you are working.
 
-![](docs/images/Mix-watching-for-updates-01.png)
 
 When a change is detected it will 'compile' the code, and generate new
 files. Success is shown below:
 
-![](docs/images/Mix-watching-for-updates-02.png)
+- Compiling...
+  ![](docs/images/Mix-watching-for-updates-01.png)
+
+- Success!
+  ![](docs/images/Mix-watching-for-updates-02.png)
 
 ## Adding Routes for Channels
 
@@ -608,7 +621,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 The middleware is how Laravel checks for authentication, and other
 possible actions.
 
-> **ASIDE:** When adding routes, it is a good idea to keep them in
+> **HINT:** When adding routes, it is a good idea to keep them in
 > alphabetical order as it makes it easier to locate them. Also,
 > group your authenticated and other types of route together as well.
 >
@@ -623,8 +636,8 @@ We place the views for any model that requires them, into a folder in
 this location.
 
 Normally the folder is named the same as the pluralised version of the
-model name. For example *Channel* becomes
-*channels*, and *Sheep* would become *sheep*.
+model name. For example *Channel* becomes *channels*, and *Sheep* would
+become *sheep*.
 
 ## Channels Views and Controller Methods
 
@@ -640,8 +653,8 @@ Before we create the index blade file, we will edit the Channels
 controller. Locate the `ChannelsController` in
 the `app/Http/Controllers` folder, and open it for editing.
 
-In this file you will find stub methods ready for you to use, such as
-the one below:
+In this file you will find stub methods (created by the `-r` option)
+ready for you to use, such as the one below:
 
 ```php
 /**
@@ -776,7 +789,7 @@ We will modify the edit and details buttons later.
 
 ### Commit!
 
-This would be a good point to add, commit and push your code.
+This would be a good point to add, commit and probably push your code.
 
 ## Edit
 
@@ -831,10 +844,12 @@ to the channel index (home) page.
 ```php
 public function update(UpdateChannelRequest $request, Channel $channel)
 {
+    $slug = $request->slug ?? $request->name;
+
     $channel->update([
                          'name' => $request->name,
                          'user_id' => $request->user_id,
-                         'slug' => Str::slug($request->slug),
+                         'slug' => Str::slug($slug),
                          'description' => $request->description,
                          'image' => $request->image,
                      ]);
@@ -893,7 +908,7 @@ public function update(User $user, Channel $channel)
         // TODO: Check if user is Admin OR the Channel Owner.
         //       Currently, prescribe user #1 (admin in dummy data) 
         //       and the logged in user if they are the channel owner
-        return $user->id === $channel->user_id || $user->id ===1 
+        return $user->id === $channel->user_id || $user->id === 1 
             ? Response::allow()
             : Response::deny('You do not own this channel.');
     }
@@ -908,7 +923,8 @@ Here is the form (we will build this in a moment):
 
 ![The Edit Channel Form](docs/images/Channel-edit-form-before-submit.png)
 
-And when Eileen tried to make changes, we get:
+And when Eileen tried to make changes on a channel she does not own, we
+get:
 
 ![Channel Editing Denied](docs/images/Edit-channel-denied.png)
 
@@ -995,7 +1011,7 @@ before the comment.
 - `@csrf` injects the Laravel Cross Site Request Forgery protection
   code.
 
-Next, immediately after the comment, replace the TEST with:
+Next, immediately after the comment, replace `TEST` with:
 
 ```php
     </form>
@@ -1111,8 +1127,8 @@ tweak it. More on the CSS tweak at the end of this section.
            id="public"
            class="focus:outline-none focus:bg-stone-500 focus:ring-2 focus:ring-offset-2
                focus:ring-stone-700
-                      checkbox w-6 h-6 rounded bg-white absolute m-1 shadow-sm appearance-none
-                      cursor-pointer"
+                      checkbox w-6 h-6 rounded bg-white absolute m-1 shadow-sm
+                      appearance-none cursor-pointer"
            @if( old('public')?? $channel->public ) checked @endif />
     <label for="public" class="toggle-label block w-16 h-8 overflow-hidden rounded bg-stone-300
         dark:bg-stone-700 cursor-pointer"></label>
@@ -1205,6 +1221,7 @@ you could create a version of 'Bootstrap' or
 
   .checkbox:checked + .toggle-label {
     @apply bg-stone-700;
+    @apply text-stone-50;
   }
 }
 ```
@@ -1275,7 +1292,7 @@ example, we only need to use the `old` function:
     value="{{ old('name') }}"
 ```
 
-The `option` in the select controle, will use the currently logged in
+The `option` in the select control, it will use the currently logged-in
 user by default:
 
 ```php
@@ -1292,10 +1309,11 @@ The `store` method will look similar to this:
 ```php
 public function store(StoreChannelRequest $request)
 {
+    $slug = $request->slug ?? $request->name;
     Channel::create( [
             'name' => $request->name,
             'user_id' => $request->user_id,
-            'slug' => Str::slug($request->slug),
+            'slug' => Str::slug($slug),
             'uid' => uniqid(true, true),
             'description' => $request->description,
             'private' => $request->private ? true : false,
@@ -1445,21 +1463,30 @@ public function run()
                 'filename' => "",
             ],
             [
+                'title' => "Everything",
+                'description' => "A white screen",
+                'duration' => "01:01:01",
+                'series' => 1,
+                'episode' => 1,
+                'channel_id' => 4,
+                'filename' => "",
+            ],
+            [
+                'title' => "Nothingness",
+                'description' => "A dark screen",
+                'duration' => "02:02:02",
+                'series' => 1,
+                'episode' => 2,
+                'channel_id' => 4,
+                'filename' => "",
+            ],
+            [
                 'title' => "Goodbye",
                 'description' => "End titles video",
                 'duration' => "00:00:12",
                 'series' => null,
                 'episode' => null,
                 'channel_id' => 2,
-                'filename' => "",
-            ],
-            [
-                'title' => "Nothingness",
-                'description' => "A dark screen",
-                'duration' => "01:01:01",
-                'series' => 1,
-                'episode' => 1,
-                'channel_id' => 4,
                 'filename' => "",
             ],
         ];
@@ -1589,7 +1616,7 @@ To do so, we click on the views folder (`resources/views`), then File
 enter.
 
 You should have a new file created as shown here:
-![](docs/images/Creating-videos-index-blade-file.png)
+![Creating videos index blade file](docs/images/Creating-videos-index-blade-file.png)
 
 The code for this page will be slightly different from the Channels
 index page, but we start with the same basic framework for the page:
@@ -1664,6 +1691,8 @@ following parts:
 
 #### Video thumbnail
 
+Add the video image as the first part of the details...
+
 ```php
 <img src="{{ asset('images/'.($video->image ?? "video.png")) }}"
      class="w-full lg:w-1/5  rounded-l bg-gray-100 dark:bg-gray-700"
@@ -1672,6 +1701,8 @@ following parts:
 ```
 
 #### Video details
+
+Now add the video's details such as title, duration, and so forth.
 
 ```php
 <div class="w-full lg:w-3/5 dark:bg-gray-800 px-4 py-2">
@@ -1684,6 +1715,11 @@ following parts:
        line-clamp-3 xs:line-clamp-2">
         {{$video->description}}
     </p>
+    <p tabindex="0"
+       class="focus:outline-none text-base leading-5 text-stone-800 dark:text-stone-50 text-xs
+       xs:text-sm">
+        Channel: {{$video->channel->name}}
+    </p>    
     <p tabindex="0"
        class="focus:outline-none text-base leading-5 text-stone-800 dark:text-stone-50 text-xs
        xs:text-sm">
@@ -1719,4 +1755,128 @@ following parts:
 </div>
 ```
 
+## Exercise: Video Show/Detail Page
+
+The video details/show page will undergo the same treatment as the
+channels.
+
+Create your own video details/show page, using the channel details/show
+page as a guide.
+
+Here are a couple of snippets for the buttons to assist.
+
+The "back to videos" is shown, most of the styles removed:
+
+```php
+<a href="{{ route('videos.index') }}"
+   class="rounded p-1 px-4 border border-1 mr-4
+      border-stone-500 bg-stone-50 text-stone-900"
+   role="button">
+   Back to Videos
+</a>
+```
+
+The delete button will use code similar to this:
+
+```php
+@auth()
+    <a href="{{ route('videos.delete', ['video'=>$video]) }}"
+       class="rounded p-1 px-4 border border-1
+          border-red-300 bg-red-50 text-red-500"
+       role="button">
+        Delete
+    </a>
+@endauth
+```
+
+## Exercise: Video Edit Page
+
+The video edit page will undergo the same treatment as the channels.
+
+Create your own video edit page, using the channel edit page as a guide.
+
+## Exercise: Video Add Page
+
+The video add page will undergo the same treatment as the channels.
+
+Create your own video add page, using the channel add page as a guide.
+
+## Video Delete and Destroy
+
+Now onto the last part of the journey for the video actions, apart from
+the uploading of files and automatically adding a thumbnail, which we
+come to later.
+
+We will want to delete videos from the application.
+
+### Policies
+
+Update the policy for the videos to allow delete and destroy.
+
+```php
+        return Response::allow();
+```
+
+Change the false to true as required.
+
+### Delete page and method
+
+The delete method is not built into the VideoController by default, so
+we need to duplicate the destroy method and rename it.
+
+Do this if you have not done so already.
+
+We want this page to show the video details and have a "delete" and a "
+cancel" button. the cancel will take the user back to the video list,
+whilst delete will call the destroy action and remove the video.
+
+#### Delete method
+
+This method will be as simple as showing a "delete confirmation" page...
+
+```php
+    public function delete(Video $video)
+    {
+        return view('videos.delete', compact(['video']));
+    }
+```
+
+#### Destroy method
+
+The destroy method deletes the video, then redirects to the video index
+with a banner to announce completed successfully.
+
+```php
+    public function destroy(Video $video)
+    {
+        // TODO: Add the removal of the video and thumbnail to this 
+        //       method before deleting the video.
+        $video->delete();
+        return redirect()->route('videos.index')->banner('Video deleted successfully.');
+    }
+```
+
+### CHECK IT IN!
+
+Enough said.
+
+# 7. Category Image upload & Thumbnail
+
+## Update filename input in the Category Add/Edit
+
+## Add image save to the create and update methods
+
+## Testing the upload
+
+# 8. Video Upload, Thumbnail and Duration Details
+
+## FFMpeg
+
+## Change video filename input
+
+## Add video conversion
+
+## Storing video data
+
+# 9. Playing videos
 

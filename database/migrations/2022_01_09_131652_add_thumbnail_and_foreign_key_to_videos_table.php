@@ -14,6 +14,7 @@ class AddThumbnailAndForeignKeyToVideosTable extends Migration
     public function up()
     {
         Schema::table('videos', function (Blueprint $table) {
+            $table->string('thumbnail')->nullable()->after('uid');
             $table->string('filename')->nullable()->after('uid');
             $table->foreign('channel_id')
                 ->references('id')->on('channels');
@@ -28,6 +29,7 @@ class AddThumbnailAndForeignKeyToVideosTable extends Migration
     public function down()
     {
         Schema::table('videos', function (Blueprint $table) {
+            $table->dropColumn('thumbnail');
             $table->dropColumn('filename');
         });
     }

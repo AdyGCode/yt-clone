@@ -23,110 +23,109 @@
                     @csrf
 
                     <!-- Channel Name -->
-                        <div class="container mx-auto px-4 py-1 mt-6 flex flex-row">
+                        <div class="container mx-auto px-4 py-1 mt-6 flex flex-row flex-wrap">
                             <label for="name" class="flex-none basis-1/4">Name</label>
                             <input type="text" class="flex-1 basis-3/4 @error('name') border-red-500 @enderror"
                                    name="name" id="name"
                                    value="{{ old('name')?? $channel->name }}"/>
-                        </div>
 
-                        @error('name')
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            @error('name')
                             <span class="flex-none basis-1/4"></span>
-                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            <p class="sm text-red-50 bg-red-500 pl-3 p-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            @enderror
                         </div>
-                        @enderror
 
-                    <!-- Channel Owner -->
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                        <!-- Channel Owner -->
+                        <div class="container mx-auto px-4 py-1 flex flex-row flex-wrap">
                             <label for="user_id" class="flex-none basis-1/4">Owner</label>
                             <select name="user_id" id="user_id"
                                     class="flex-1 basis-3/4 @error('user_id') border-red-500 @enderror ">
                                 @foreach($users as $user)
                                     <option value="{{$user->id}}"
-                                            @if($user->id === (old('user_id')?? auth()->user()->id)) selected @endif >
+                                            @if($user->id == (old('user_id')?? auth()->user()->id)) selected @endif >
                                         {{$user->name}}
                                     </option>
                                 @endforeach
                             </select>
-                        </div>
 
-                        @error('user_id')
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            @error('user_id')
                             <span class="flex-none basis-1/4"></span>
-                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: Channel owner must be selected</p>
+                            <p class="sm text-red-50 bg-red-500 pl-3 p-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            @enderror
                         </div>
-                        @enderror
 
-                    <!-- Channel Slug -->
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+
+                        <!-- Channel Slug -->
+                        <div class="container mx-auto px-4 py-1 flex flex-row flex-wrap">
                             <label for="slug" class="flex-none basis-1/4">Slug</label>
                             <input type="text" class="flex-1 basis-3/4 @error('slug') border-red-500 @enderror"
                                    name="slug" id="slug"
                                    value="{{ old('slug')?? $channel->slug }}"/>
-                        </div>
 
-                        @error('slug')
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            @error('slug')
                             <span class="flex-none basis-1/4"></span>
-                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
-                        </div>
-                        @enderror
+                            <p class="sm text-red-50 bg-red-500 pl-3 p-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            @enderror
 
-                    <!-- Channel Public/Private -->
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            <span class="flex-none basis-1/4"></span>
+                            <span class="basis-1/1 text-sm text-stone-500">Leave blank for default slug.</span>
+                        </div>
+
+
+                        <!-- Channel Public/Private -->
+                        <div class="container mx-auto px-4 py-1 flex flex-row flex-wrap">
                             <label for="public" class="flex-none basis-1/4">Public</label>
 
                             <div class="flex-0 cursor-pointer relative shadow-sm">
-                                <input aria-label="public toggle" type="checkbox" name="public" id="public"
-                                       class="focus:outline-none focus:bg-stone-500 focus:ring-2 focus:ring-offset-2
-                                       focus:ring-stone-700
-                                              checkbox w-6 h-6 rounded bg-white absolute m-1 shadow-sm appearance-none
-                                              cursor-pointer"
+                                <input aria-label="public video toggle" type="checkbox" name="public" id="public"
+                                       class="w-6 h-6 rounded absolute m-1 shadow-sm appearance-none cursor-pointer
+                                              focus:outline-none focus:bg-stone-700 focus:ring-2 focus:ring-offset-2
+                                              focus:ring-stone-700 text-stone-700
+                                              bg-stone-700 checkbox "
+                                       value="1"
                                        @if(old('public')?? $channel->public) checked @endif />
-                                <label for="public" class="toggle-label block w-16 h-8 overflow-hidden rounded bg-stone-300
-                                dark:bg-stone-700 cursor-pointer"></label>
+
+                                <label for="public"
+                                       class="toggle-label block w-16 h-8 overflow-hidden rounded
+                                              bg-stone-300 dark:bg-stone-700 cursor-pointer"></label>
                             </div>
-                        </div>
 
-                        @error('public')
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            @error('public')
                             <span class="flex-none basis-1/4"></span>
-                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            <p class="sm text-red-50 bg-red-500 pl-3 p-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            @enderror
                         </div>
-                        @enderror
 
-                    <!-- Channel Description -->
-                        <div class="container mx-auto my-1 px-4 py-1 flex flex-row border border-0 border-b-1 border-stone-200">
+
+                        <!-- Channel Description -->
+                        <div class="container mx-auto my-1 px-4 py-1 flex flex-row flex-wrap">
                             <label for="description" class="flex-none basis-1/4">Description</label>
                             <textarea id="description" name="description"
                                       class="flex-1 basis-3/4 @error('description') border-red-500 @enderror"
                             >{{ old('description')?? $channel->description }}</textarea>
-                        </div>
 
-                        @error('description')
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            @error('description')
                             <span class="flex-none basis-1/4"></span>
-                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            <p class="sm text-red-50 bg-red-500 pl-3 p-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            @enderror
                         </div>
-                        @enderror
 
-                    <!-- Channel Image -->
-                        <div class="container mx-auto px-4 py-1 mb-6 flex flex-row">
+
+                        <!-- Channel Image -->
+                        <div class="container mx-auto px-4 py-1 mb-6 flex flex-row flex-wrap">
                             <label for="image" class="flex-none basis-1/4">Channel Image</label>
                             <input type="text" class="flex-1 basis-3/4"
                                    name="image" id="image"
                                    value="{{ old('image')?? $channel->image }}"/>
-                        </div>
 
-                        @error('image')
-                        <div class="container mx-auto px-4 py-1 flex flex-row">
+                            @error('image')
                             <span class="flex-none basis-1/4"></span>
-                            <p class="sm text-red-500 py-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            <p class="sm text-red-50 bg-red-500 pl-3 p-1 flex-1 basis-3/4">Error: {{ $message }}</p>
+                            @enderror
                         </div>
-                    @enderror
 
-                    <!-- Submission Buttons -->
+
+                        <!-- Submission Buttons -->
                         <div class="container mx-auto px-4 py-1 my-6 mb-4 flex flex-row gap-4">
                             <span class="basis-1/4 flex-none"></span>
                             <button type="submit" name="button"

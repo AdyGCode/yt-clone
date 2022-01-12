@@ -73,7 +73,7 @@ class Channel extends Model
     /**
      * A channel BELONGS TO a user.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user()
     {

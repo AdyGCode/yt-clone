@@ -58,7 +58,7 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-        //
+        return view('videos.show', compact(['video']));
     }
 
     /**
@@ -93,7 +93,7 @@ class VideoController extends Controller
      */
     public function delete(Video $video)
     {
-        //
+        return view('videos.delete', compact(['video']));
     }
 
     /**
@@ -104,6 +104,10 @@ class VideoController extends Controller
      */
     public function destroy(Video $video)
     {
-        //
+        // TODO: Add the removal of the video and thumbnail to this
+        //       method before deleting the video.
+
+        $video->delete();
+        return redirect()->route('videos.index')->banner('Video deleted successfully.');
     }
 }

@@ -51,10 +51,12 @@ class ChannelController extends Controller
      */
     public function store(StoreChannelRequest $request)
     {
+        $slug = $request->slug ?? $request->name;
+
         Channel::create([
                             'name' => $request->name,
                             'user_id' => $request->user_id,
-                            'slug' => Str::slug($request->slug),
+                            'slug' => Str::slug($slug),
                             'uid' => uniqid(true, true),
                             'description' => $request->description,
                             'private' => $request->private ? true : false,
@@ -96,10 +98,12 @@ class ChannelController extends Controller
      */
     public function update(UpdateChannelRequest $request, Channel $channel)
     {
+        $slug = $request->slug ?? $request->name;
+
         $channel->update([
                              'name' => $request->name,
                              'user_id' => $request->user_id,
-                             'slug' => Str::slug($request->slug),
+                             'slug' => Str::slug($slug),
                              'description' => $request->description,
                              'image' => $request->image,
                          ]);

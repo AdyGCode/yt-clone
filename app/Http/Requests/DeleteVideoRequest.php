@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreChannelRequest extends FormRequest
+class DeleteVideoRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,7 @@ class StoreChannelRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -24,10 +24,7 @@ class StoreChannelRequest extends FormRequest
     public function rules()
     {
         return [
-            "name" => ['required', 'min:4'],
-            'slug' => ['nullable', 'min:4', 'unique:channels,slug'],
-            'public' => ['nullable',],
-            'description' => ['nullable', 'max:4096'],
+            //
         ];
     }
 }

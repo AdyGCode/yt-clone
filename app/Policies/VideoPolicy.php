@@ -31,7 +31,7 @@ class VideoPolicy
      */
     public function view(User $user, Video $video)
     {
-        return Response::deny();
+        return Response::allow();
     }
 
     /**
@@ -66,7 +66,7 @@ class VideoPolicy
      */
     public function delete(User $user, Video $video)
     {
-        return Response::deny();
+        return Response::allow();
     }
 
     /**
@@ -90,6 +90,7 @@ class VideoPolicy
      */
     public function forceDelete(User $user, Video $video)
     {
-        return Response::deny();
+        ddd("force delete");
+        return Response::allow();
     }
 }

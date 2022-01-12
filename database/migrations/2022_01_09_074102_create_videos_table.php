@@ -22,6 +22,8 @@ class CreateVideosTable extends Migration
             $table->unsignedSmallInteger('series')->nullable();
             $table->unsignedSmallInteger('episode')->nullable();
             $table->unsignedBigInteger('channel_id')->default(0);
+            $table->unsignedBigInteger('user_id')->default(0);
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }

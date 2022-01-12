@@ -25,8 +25,8 @@ class UpdateChannelRequest extends FormRequest
     {
         return [
             "name" => ['required', 'min:4'],
-            'slug' => ['required', 'min:4', 'unique:channels,slug,'.$this->channel->id],
-            'public' => ['nullable', 'boolean',],
+            'slug' => ['nullable', 'min:4', 'unique:channels,slug,'.$this->channel->id],
+            'public' => ['nullable', 'integer'],
             'description' => ['nullable', 'max:4096'],
         ];
     }
